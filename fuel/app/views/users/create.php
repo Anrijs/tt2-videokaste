@@ -24,11 +24,11 @@
     <input type="password" class="form-control" id="c_password" name="c_password" placeholder="Confirm Password">
  </div>
 
-<?php if(isset($error)) { ?>
+<?php if(Session::get_flash('error')) { ?>
  <div class="alert alert-warning">
  	<?php 
 
- 		echo $error;
+ 		echo Session::get_flash('error');
 
  	?>
  </div>

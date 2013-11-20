@@ -29,7 +29,7 @@
             <?php if($current_user['group_id']>=50||$current_user['id']==$tutorial['author_id']) { ?>
                 <a href="/tutorials/edit/<?php echo $tutorial['id']; ?>"><span class="glyphicon glyphicon-pencil"></span></a>
             <?php } ?>
-            <a href="/tutorials/<?php echo $tutorial['id']; ?>" class="title"><h2 class="pull-left;"><?php echo $tutorial['title']; ?></h2></a><br>
+            <a href="/tutorials/<?php echo $tutorial['id']; ?>" class="title"><h2 class="pull-left;" style="overflow:hidden;"><?php echo $tutorial['title']; ?></h2></a><br>
             <a href="/users/<?php echo $tutorial['author_id']; ?>" class="author">by <?php echo  Helper::visual_name($tutorial['author_id']); ?></a>
             <a href="/explore/<?php echo $tutorial['category_id']; ?>" class="v_category">(<?php echo $tutorial['category']; ?>)</a>
             <p class="description">

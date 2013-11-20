@@ -1,17 +1,17 @@
 <?php 
 Class Helper {
 
-public static function visual_name_nav($user_id = null) 
+	public static function visual_name_nav($user_id = null) 
 	{
 		if($user_id)
 		{
 			$user = Model_User::find($user_id);
 			switch ($user['group_id']) {
 				case '10':
-					return ' <span style="color:#33b5e5;">'.$user->username.' <span text="Pārbaudīts lietotājs" class="glyphicon glyphicon-ok"> </span></span>';
+					return ' <span style="color:#33b5e5;">'.$user->username.' <span title="Pārbaudīts lietotājs" class="glyphicon glyphicon-ok"> </span></span>';
 					break;
 				case '100':
-					return ' <span style="color:#33dd33;">'.$user->username.' <span text="Administrators" class="glyphicon glyphicon-leaf"> </span></span>';
+					return ' <span style="color:#33dd33;">'.$user->username.' <span title="Administrators" class="glyphicon glyphicon-leaf"> </span></span>';
 				break;
 				default:
 					return ' <span>'.$user->username.'</span>';
@@ -20,23 +20,32 @@ public static function visual_name_nav($user_id = null)
 		}
 	}
 
-public static function visual_name($user_id = null) 
+	public static function visual_name($user_id = null) 
 	{
 		if($user_id)
 		{
 			$user = Model_User::find($user_id);
 			switch ($user['group_id']) {
 				case '10':
-					return $user->username.' <span text="Pārbaudīts lietotājs" class="glyphicon glyphicon-ok"> </span>';
+					return $user->username.' <span style="font-size:0.7em;" title="Pārbaudīts lietotājs" class="glyphicon glyphicon-ok"> </span>';
 					break;
 				case '100':
-					return $user->username.' <span text="Administrators" class="glyphicon glyphicon-leaf"> </span>';
+					return $user->username.' <span style="font-size:0.7em;" title="Administrators" class="glyphicon glyphicon-leaf"> </span>';
 				break;
 				default:
 					return ' <span>'.$user->username.'</span>';
 					break;
 			}
 		}
+	}
+
+	public static function decode_video_url($url)
+	{
+		parse_str( parse_url( $url, PHP_URL_QUERY ), $my_array_of_vars );
+		if(isset($my_array_of_vars['v'])) {
+			return $my_array_of_vars['v'];
+		}
+		else return 0;
 	}
 
 }

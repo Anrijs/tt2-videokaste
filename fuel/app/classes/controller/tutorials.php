@@ -112,7 +112,14 @@ class Controller_Tutorials extends Controller_Base
 
 	public function action_create()
 	{	
-		$error = NULL;
+		$post_data['title'] = '';
+		$post_data['description'] = '';
+		$post_data['contents'] = '';
+		$post_data['videourl'] = '';
+		$post_data['category'] = '';
+		$post_data['visibility0'] = '';
+		$post_data['visibility1'] = '';
+
 		if(Input::method() == 'POST')
 		{
 			$title = Input::post('title');
@@ -121,6 +128,17 @@ class Controller_Tutorials extends Controller_Base
 			$videourl = Input::post('videourl');
 			$category_id = Input::post('category');
 			$is_public = Input::post('visibility');
+
+			$post_data['title'] = $title;
+			$post_data['description'] = $description;
+			$post_data['contents'] = $contents;
+			$post_data['videourl'] = $videourl;
+			$post_data['category'] = $category_id;
+			if($is_public) {
+				$post_data['visibility1'] = 'checked'; }
+			else {
+				$post_data['visibility0'] = 'checked'; }
+
 			//$users = DB::select('*')->from('users')->where(strtolower('username'), strtolower(Input::post('username')))->or_where(strtolower('email'), strtolower(Input::post('email')))->execute();
 			//$users_cout = count($users);
 			$tutorial = Model_Tutorial::forge()->set(array(
@@ -133,8 +151,11 @@ class Controller_Tutorials extends Controller_Base
 				'is_public' => $is_public,
 				'views' => '0' 
 			));
-
-			if($tutorial->save())
+			if(!Helper::decode_video_url($videourl)) {
+				Session::set_flash('error', 'Video adrese ir ievadīta nepareizi.');
+				Response::redirect('/tutorials/create/'.$tutorial->id, array('post_data' => $post_data));
+			}
+			else if($tutorial->save())
 			{
 				Session::set_flash('success', 'Pamācība ir veiksmīgi pievienota!');
 				Response::redirect('/tutorials/'.$tutorial->id);
@@ -145,7 +166,8 @@ class Controller_Tutorials extends Controller_Base
 		$this->template->navbar = array('explore' => 'active');
 		$this->template->title = 'Tutorials &raquo; Create';
 		$this->template->content = View::forge('tutorials/create', array(
-			'categories' => $categories
+			'categories' => $categories,
+			'post_data' => $post_data,
 			));
 	}
 
@@ -179,6 +201,10 @@ class Controller_Tutorials extends Controller_Base
 			$tutorial->category_id = $category_id;
 			$tutorial->is_public = $is_public;
 
+			if(!Helper::decode_video_url($videourl)) {
+				Session::set_flash('error', 'Video adrese ir ievadīta nepareizi.');
+				Response::redirect('/tutorials/edit/'.$tutorial->id);
+			}
 			if($tutorial->save())
 			{
 				Session::set_flash('success', 'Pamācība ir veiksmīgi sglabāta!');

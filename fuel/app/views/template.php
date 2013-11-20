@@ -62,7 +62,7 @@
             <?php if($current_user): ?>
             <li><a href="/users/<?php echo $current_user['id']; ?>">
               <?php 
-                echo  Helper::visual_name($current_user['id']);
+                echo  Helper::visual_name_nav($current_user['id']);
               ?>
             </a>
             </li>
@@ -92,7 +92,6 @@
     </div>
 
     <?php echo $content; ?>
-
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

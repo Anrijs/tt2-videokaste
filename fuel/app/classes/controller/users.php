@@ -46,7 +46,6 @@ class Controller_Users extends Controller_Base
 
 	public function action_create()
 	{
-		$error = NULL;
 		if(Input::method() == 'POST')
 		{
 			$users = DB::select('*')->from('users')->where(strtolower('username'), strtolower(Input::post('username')))->or_where(strtolower('email'), strtolower(Input::post('email')))->execute();
@@ -65,15 +64,13 @@ class Controller_Users extends Controller_Base
 			}
 			else
 			{
-				$error = 'Username or email is already in use.<br>Please try another one';
+				Session::set_flash('error','Username or email is already in use.<br>Please try another one');
 			}
 		}
 
 		$this->template->navbar = array('' => '');
 		$this->template->title = 'Login';
-		$this->template->content = View::forge('users/create', array(
-				'error' => $error
-				),false);
+		$this->template->content = View::forge('users/create');
 	}
 
 

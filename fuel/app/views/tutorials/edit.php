@@ -12,6 +12,11 @@
 <div class="contents tutorial_form"> <!-- class="container" -->
 
 	<h1 style="display:inline;"> Rediģēt pamācību </h1>
+  <?php if(Session::get_flash('error')) { 
+    echo '<div class="alert alert-danger">';
+    echo Session::get_flash('error'); 
+    echo '</div>';
+ } ?>
   <a id="confirmButton" onclick="confirmDelete();" href="#"><span class="glyphicon glyphicon-trash"></span>Dzēst pamācību</a>
   <div id="confirmDelete" style="display: none; margin:16px; padding-bottom:44px;" class="alert alert-danger">
     <h4>Vai tiešām vēlies izszēst šo pamācību? Šis process ir neatgriezenisks!</h4>

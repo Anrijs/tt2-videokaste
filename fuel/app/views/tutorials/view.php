@@ -4,7 +4,14 @@
         <!-- Listitem start -->
 
 
-            <h2 class="pull-left;"><?php echo $tutorial['title']; ?></h2>
+            <h2 class="pull-left;">
+              <?php 
+                if($author['id']==$current_user['id']||$current_user['group_id']>=50) {
+                  echo '<a href="/tutorials/edit/'.$tutorial['id'].'"<span style="font-size:0.6em;" class="glyphicon glyphicon-pencil"></span></a>';
+                }
+                echo ' '.$tutorial['title']; 
+              ?>
+            </h2>
             <?php 
               if(Session::get_flash('success')) {
                 ?>
@@ -23,10 +30,8 @@
                   <img class="ratio" src="http://placehold.it/16x9"/>
                   <?php 
                   	$videourl = $tutorial['videourl'];
-                  		$index = strpos($tutorial['videourl'], 'watch?v=') + strlen('watch?v=');
-						$videourl = substr($tutorial['videourl'], $index);
-                   ?>
-                  <iframe src="//www.youtube.com/embed/<?php echo $videourl; ?>" frameborder="0" allowfullscreen></iframe>
+                  ?>
+                  <iframe src="//www.youtube.com/embed/<?php echo Helper::decode_video_url($videourl); ?>" frameborder="0" allowfullscreen></iframe>
                   <?php echo $tutorial['videourl']; ?>
               </div>
              <?php echo $tutorial['contents']; ?>
