@@ -2,6 +2,7 @@
 
 class Controller_Tutorials extends Controller_Base
 {
+	// If user not loged in, redirect to landing page, else redirect to users stream
 	public function action_index() {
 		if(!$this->current_user) {
 			Response::redirect('/');
@@ -13,9 +14,10 @@ class Controller_Tutorials extends Controller_Base
 	{
 		// TODO: paginate
 
-		//check if it's a valid category
+		//Check if it's a valid category
 		$error_msg = '';
 		$search_users = '';
+		// If nothing found for this id and id not NULL, to allow all tuts page
 		if(!count(DB::select('*')->from('categories')->where('id', $category_id)->execute())&&$this->param('id')!==NULL) {
 			$error_msg .= '<div class="well">';
 			$error_msg .= '<h2> Sorry, but this category doesn\'t exisy (yet)</h2>';
@@ -24,16 +26,18 @@ class Controller_Tutorials extends Controller_Base
 			$error_msg .= '</div>';
 		}
 
-		//Make subquery for additional details
+		//Make subquery for author name
 		$exp = DB::expr('`tutorials`.author_id');
 		$mini_author = DB::select('username')->from('users')->where('id',$exp);
 
+		// Another subquery for category name
 		$exp2 = DB::expr('`tutorials`.category_id');
 		$mini_category = DB::select('title')->from('categories')->where('id',$exp2);
 
-		// Select depending on selected category or search query
+		// If search set, go for it.   This should be moved to search action!
 		if(isset($_GET['srch'])&&$_GET['srch']!==NULL) {
 			$term = $_GET['srch'];
+			// Search by title and description keywords
 			$tutorials = DB::select('*', array($mini_author, 'username'),array($mini_category, 'category'))->from('tutorials')->
 				where('title', 'LIKE', '%'.$term.'%')->
 				or_where('description', 'LIKE', '%'.$term.'%')->
@@ -41,10 +45,12 @@ class Controller_Tutorials extends Controller_Base
 			$search_users = DB::select('*')->from('users')->where('username', 'LIKE', '%'.$term.'%')->order_by('username', 'ASC')->execute()->as_array();
 			$active_category = '0';
 		}
+		// Else if category is set, select tutorials from it
 		else if($this->param('id')) {
 			$tutorials = DB::select('*', array($mini_author, 'username'),array($mini_category, 'category'))->from('tutorials')->where('category_id', $this->param('id'))->order_by('created_at','DESC')->execute()->as_array();
 			$active_category = $this->param('id');
 		}
+		// Else - nothing is set, show everything i've got
 		else {
 			$tutorials = DB::select('*', array($mini_author, 'username'),array($mini_category, 'category'))->from('tutorials')->order_by('created_at','DESC')->execute()->as_array();
 			$active_category = '0';
@@ -70,27 +76,21 @@ class Controller_Tutorials extends Controller_Base
 			Response::redirect('/');
 		} 
 
-		// Plain SQL
-		// SELECT * FROM `tutorials` WHERE `author_id` IN (SELECT `following_id` FROM `followers` WHERE `follower_id` LIKE 1)
-		// $this->current_user->id
-
-		//New - gimme also author name!
-		/* 
-			SELECT *,(SELECT `username` FROM `users` WHERE `id` LIKE `tutorials`.`author_id`) as author,
-					 (SELECT `title` FROM `categories` WHERE `id` LIKE `tutorials`.`category_id`) as category 
-					 FROM `tutorials` WHERE `author_id` IN 
-					 (SELECT `following_id` FROM `followers` WHERE `follower_id` LIKE 2)
-		*/
-
+		// Make subquery to select users followed by current_user
 		$mini = DB::select('following_id')->from('followers')->where('follower_id', $this->current_user->id);
 		$exp = DB::expr('`tutorials`.author_id');
+		// Now select their real usernames
 		$mini_author = DB::select('username')->from('users')->where('id',$exp);
 
+		// Subquery to get category data for tutorial
 		$exp2 = DB::expr('`tutorials`.category_id');
 		$mini_category = DB::select('title')->from('categories')->where('id',$exp);
 
-		$page_limit=5;
-		$paginate=0;
+		// Paginate
+		$page_limit=Config::get('paginate_single'); // Page limit from settings
+		$paginate=0;	// Tutorial offset for SQL
+
+		// If page is set, change current page
 		if(isset($_GET['page'])) {
 			$paginate=($_GET['page']-1)*$page_limit;
 		}
@@ -98,9 +98,11 @@ class Controller_Tutorials extends Controller_Base
 			$paginate=0;
 		}
 
+		// Get tutorials count, then calculate how many pages there will be (used to disable buttons)
 		$tutorials_count = DB::select('*')->from('tutorials')->where('author_id', 'IN', $mini)->order_by('created_at','DESC')->execute()->as_array();
 		$page_count=floor(count($tutorials_count)/$page_limit)+1;
 
+		// Select tutorials from page
 		$tutorials = DB::select('*',array($mini_author, 'username'),array($mini_category, 'category'))->from('tutorials')->where('author_id', 'IN', $mini)->order_by('created_at','DESC')->limit($page_limit)->offset($paginate)->execute()->as_array();
 		
 		$this->template->navbar = array('stream' => 'active');
@@ -112,6 +114,7 @@ class Controller_Tutorials extends Controller_Base
 
 	public function action_create()
 	{	
+		// Data that will contain input values in case of registration failure
 		$post_data['title'] = '';
 		$post_data['description'] = '';
 		$post_data['contents'] = '';
@@ -120,8 +123,10 @@ class Controller_Tutorials extends Controller_Base
 		$post_data['visibility0'] = '';
 		$post_data['visibility1'] = '';
 
+		// If have POST data atempt tutorial create
 		if(Input::method() == 'POST')
 		{
+			// Get POST data
 			$title = Input::post('title');
 			$description = Input::post('description');
 			$contents = Input::post('contents');
@@ -129,18 +134,7 @@ class Controller_Tutorials extends Controller_Base
 			$category_id = Input::post('category');
 			$is_public = Input::post('visibility');
 
-			$post_data['title'] = $title;
-			$post_data['description'] = $description;
-			$post_data['contents'] = $contents;
-			$post_data['videourl'] = $videourl;
-			$post_data['category'] = $category_id;
-			if($is_public) {
-				$post_data['visibility1'] = 'checked'; }
-			else {
-				$post_data['visibility0'] = 'checked'; }
-
-			//$users = DB::select('*')->from('users')->where(strtolower('username'), strtolower(Input::post('username')))->or_where(strtolower('email'), strtolower(Input::post('email')))->execute();
-			//$users_cout = count($users);
+			// Write POST data to new tutorial without saving it
 			$tutorial = Model_Tutorial::forge()->set(array(
 				'title' => $title,
 				'description' => $description,
@@ -151,18 +145,52 @@ class Controller_Tutorials extends Controller_Base
 				'is_public' => $is_public,
 				'views' => '0' 
 			));
+
+			// If youtube link was not valid
 			if(!Helper::decode_video_url($videourl)) {
+
+				// Write data to allow retrying without loosing entered form data
+				$post_data['title'] = $title;
+				$post_data['description'] = $description;
+				$post_data['contents'] = $contents;
+				$post_data['videourl'] = $videourl;
+				$post_data['category'] = $category_id;
+				if($is_public) {
+					$post_data['visibility1'] = 'checked'; }
+				else {
+					$post_data['visibility0'] = 'checked'; }
+
+				// Set flash and reload register page
 				Session::set_flash('error', 'Video adrese ir ievadīta nepareizi.');
 				Response::redirect('/tutorials/create/'.$tutorial->id, array('post_data' => $post_data));
 			}
+			// If tests OK, try to save
 			else if($tutorial->save())
 			{
 				Session::set_flash('success', 'Pamācība ir veiksmīgi pievienota!');
 				Response::redirect('/tutorials/'.$tutorial->id);
 			}
-		}
+			// If couldn't save for some unknown reason
+			else {
+				// Write data to allow retrying without loosing entered form data
+				$post_data['title'] = $title;
+				$post_data['description'] = $description;
+				$post_data['contents'] = $contents;
+				$post_data['videourl'] = $videourl;
+				$post_data['category'] = $category_id;
+				if($is_public) {
+					$post_data['visibility1'] = 'checked'; }
+				else {
+					$post_data['visibility0'] = 'checked'; }
 
+				// Set flash and reload register page
+				Session::set_flash('error', 'Neizdevās pievienot pamācību. (Servera kļūda) <br> Mēģiniet vēlreiz.');
+				Response::redirect('/tutorials/create/'.$tutorial->id, array('post_data' => $post_data));
+			}
+		}
+		// Select category list for 
 		$categories = DB::select('*')->from('categories')->order_by('title','ASC')->execute()->as_array();
+
 		$this->template->navbar = array('explore' => 'active');
 		$this->template->title = 'Tutorials &raquo; Create';
 		$this->template->content = View::forge('tutorials/create', array(
@@ -180,13 +208,15 @@ class Controller_Tutorials extends Controller_Base
 			Response::redirect_back('/stream', 'refresh');
 		}
 
+		// Disallow editing, if this isnt your tuturial (unless you are admin or moderetor)
 		if(($tutorial->author_id!=$this->current_user['id'])&&($this->current_user['group_id']<50)) { // -1=ban, 1=user, 50=moderator, 100=admin
 			Response::redirect_back('/stream', 'refresh');
 		}
 
+		// Try to update tutorial
 		if(Input::method() == 'POST')
 		{	
-
+			// Get POST data
 			$title = Input::post('title');
 			$description = Input::post('description');
 			$contents = Input::post('contents');
@@ -194,6 +224,7 @@ class Controller_Tutorials extends Controller_Base
 			$category_id = Input::post('category');
 			$is_public = Input::post('visibility');
 
+			// Set new values
 			$tutorial->title = $title;
 			$tutorial->description = $description;
 			$tutorial->contents = $contents;
@@ -201,11 +232,13 @@ class Controller_Tutorials extends Controller_Base
 			$tutorial->category_id = $category_id;
 			$tutorial->is_public = $is_public;
 
+			// If link was not valid
 			if(!Helper::decode_video_url($videourl)) {
 				Session::set_flash('error', 'Video adrese ir ievadīta nepareizi.');
 				Response::redirect('/tutorials/edit/'.$tutorial->id);
 			}
-			if($tutorial->save())
+			// Else try to save it
+			else if($tutorial->save())
 			{
 				Session::set_flash('success', 'Pamācība ir veiksmīgi sglabāta!');
 				Response::redirect('/tutorials/'.$tutorial->id);
@@ -220,20 +253,21 @@ class Controller_Tutorials extends Controller_Base
 			));
 	}
 
+
 	public function action_delete($tutorial_id)
 	{
 		//Find tutorial
 		$tutorial = Model_Tutorial::find_by_id($tutorial_id);
-		//Get permissions
+		//If tutorial doesn't exist, redirect to home
 		if(!$tutorial) {
 			Response::redirect('/stream');
 		}
+		// Disallow deleteing, if this isnt your tuturial (unless you are admin or moderetor)
 		if(($tutorial->author_id!=$this->current_user['id'])&&($this->current_user['group_id']<50)) { // -1=ban, 1=user, 50=moderator, 100=admin
 			Response::redirect_back('/stream', 'refresh');
 		}
-
-		//delete it!
-		if($tutorial) {
+		else if($tutorial) {
+			// Delete tutorial
 			$tutorial->delete();
 		}
 
@@ -246,22 +280,27 @@ class Controller_Tutorials extends Controller_Base
 
 	public function action_view($tutorial_id)
 	{
+		// Select categories and tutorial
 		$categories = DB::select('*')->from('categories')->order_by('title','ASC')->execute()->as_array();
 		$tutorial = Model_Tutorial::find_by_id($tutorial_id);
 
+		// If this tutorial doesnt exist, set flash
 		if(!count($tutorial)) {
 			Session::set_flash('error', 'Pamācība netika artasta. Iespējams, tā ir izdzēsta, vai arī nekad nav eksistējusi.');
 			Response::redirect_back('/stream', 'refresh');
 		}
 		
-
+		// Get author data
 		$author = Model_User::find_by_id($tutorial['author_id']);
 		
+		// Set up view cookie
 		$cookie_id='vk_watched_'.$tutorial_id;
 		$cookie_value='1';
+		// Get video cookie
 		$cookie_time=Config::get('cookies_watch_time');
 
-		if(Cookie::get($cookie_id)!='1'&&$tutorial['author_id']!==$this->current_user['id']) { // Not seen
+		// If cookie doesn't exist and this this user video, add watch time and create cookie
+		if(Cookie::get($cookie_id)!='1'&&$tutorial['author_id']!==$this->current_user['id']) {
 			Cookie::set($cookie_id,$cookie_value,$cookie_time);
 			$tutorial->views = $tutorial->views+1;
 			$tutorial->save();

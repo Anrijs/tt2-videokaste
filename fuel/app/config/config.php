@@ -12,7 +12,9 @@
 
 
 return array(
-	'cookie_watch_time ' => '600', // lasts for 10 minutes
+	'cookie_watch_time' => '600', // lasts for 10 minutes
+	'paginate_single' => '5', // lasts for 10 minutes
+	'paginate_double' => '10', // lasts for 10 minutes
 	/**
 	 * base_url - The base URL of the application.
 	 * MUST contain a trailing slash (/)

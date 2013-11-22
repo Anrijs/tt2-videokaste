@@ -2,7 +2,7 @@
 
 class Controller_Users extends Controller_Base
 {
-
+	// User profile page
 	public function action_view($id = null)
 	{
 		$user = Model_User::find($id);
@@ -14,19 +14,22 @@ class Controller_Users extends Controller_Base
 		));
 	}
 
+	// Login page and processing
 	public function action_login()
 	{
+		// If got POST data (user tried to login)
 		if(Input::method() == 'POST')
 		{
+			// Login with input data
 			if(Auth::login(Input::post('username'), Input::post('password')))
 			{
-				Session::set_flash('success', 'You have logged in!');
-
 				Response::redirect('/');
 			}
+			// Couldn't login, show flash
 			else
 			{
-				exit('Invalid login');
+				Session::set_flash('error', 'Nepareizs lietotājvārds vai parole!');
+				Response::redirect('/login');
 			}
 		}
 
@@ -35,6 +38,7 @@ class Controller_Users extends Controller_Base
 		$this->template->content = View::forge('users/login');
 	}
 
+	// Log out user, redirect to landing page
 	public function action_logout()
 	{
 		Auth::logout();
@@ -44,27 +48,33 @@ class Controller_Users extends Controller_Base
 		Response::redirect('/');
 	}
 
+	//Register user
 	public function action_create()
 	{
+		// If got POST data, atempt to register user
 		if(Input::method() == 'POST')
 		{
+			// Chech if username and/or email is not in use
 			$users = DB::select('*')->from('users')->where(strtolower('username'), strtolower(Input::post('username')))->or_where(strtolower('email'), strtolower(Input::post('email')))->execute();
 			$users_cout = count($users);
+			// If nothing found, register user as username and email is not used
 			if(!$users_cout) {
 				if(Auth::create_user(Input::post('username'), Input::post('password'), Input::post('email'), 1))
 				{
-					Session::set_flash('success', 'You have registred in!');
+					Session::set_flash('success', 'Reģistrācija notika veiksmīgi!');
+					// After creating user, do auto-login
 					if(Auth::login(Input::post('username'), Input::post('password')))
 					{
-						Session::set_flash('success', 'You have logged in!');
 						Response::redirect('/');
 					}
 					Response::redirect('/');
 				}
 			}
+			// If something found, username or email is already in use
+			// Tell user to try again
 			else
 			{
-				Session::set_flash('error','Username or email is already in use.<br>Please try another one');
+				Session::set_flash('error','Lietotājvārds vai epasts jau tiek izmantots.<br>Mēģiniet vēlreiz');
 			}
 		}
 

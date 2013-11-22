@@ -4,11 +4,12 @@ class Controller_Welcome extends Controller_Base
 {
 	public function action_index()
 	{	
-		
+		// If user is signed in, redirect
 		if($this->current_user) {
-			// DO if signed in!
 			Response::redirect('/stream');
 		}
+
+		// Else get stats and render landing page for guests
 		$total_users = count(DB::select('*')->from('users')->execute());
 		$total_tutorials = count(DB::select('*')->from('tutorials')->execute());
 		
@@ -20,6 +21,7 @@ class Controller_Welcome extends Controller_Base
 			));
 	}
 
+	// Render about page
 	public function action_about()
 	{
 		$this->template->title = 'Videokaste.lv';
