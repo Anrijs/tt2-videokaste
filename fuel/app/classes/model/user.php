@@ -6,7 +6,9 @@ class Model_User extends \Orm\Model
 		'id',
 		'username',
 		'email',
+		'updated_at',
 		'created_at',
+		'profile_fields',
 		'group_id',
 	);
 

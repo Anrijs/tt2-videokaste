@@ -126,6 +126,8 @@ class Controller_Tutorials extends Controller_Base
 		// If have POST data atempt tutorial create
 		if(Input::method() == 'POST')
 		{
+			$validated = true;
+			$error_msg = '';
 			// Get POST data
 			$title = Input::post('title');
 			$description = Input::post('description');
@@ -146,6 +148,36 @@ class Controller_Tutorials extends Controller_Base
 				'views' => '0' 
 			));
 
+			if(mb_strlen($title)>20||mb_strlen($title)<5) 
+			{
+				$validated = false;
+				$error_msg .= '<li>Virsrakstam jābūt 5-50 simbolus garam</li>';
+			}
+
+			if(mb_strlen($description)<30||mb_strlen($description)>400) {
+				$validated = false;
+				$error_msg .= '<li>Aprakstam jābūt 30-400 simbolus garam</li>';
+			}
+
+			if(mb_strlen($contents)>2000) {
+				$validated = false;
+				$error_msg .= '<li>Papildus informācija nevar būt garāka par 2000 simpoliem</li>';
+			}
+
+			// Look for category
+			$categorie = DB::select('*')->from('categories')->where('id',$category_id)->execute();
+			if(!count($categorie))
+			{
+				$validated = false;
+				$error_msg .= '<li>Nav naorādīta pareiza video kategorija</li>';
+			}
+
+			if(is_null($is_public))
+			{
+				$validated = false;
+				$error_msg .= '<li>Nav norādīta pamācības redzamība</li>';
+			}
+
 			// If youtube link was not valid
 			if(!Helper::decode_video_url($videourl)) {
 
@@ -161,14 +193,17 @@ class Controller_Tutorials extends Controller_Base
 					$post_data['visibility0'] = 'checked'; }
 
 				// Set flash and reload register page
-				Session::set_flash('error', 'Video adrese ir ievadīta nepareizi.');
-				Response::redirect('/tutorials/create/'.$tutorial->id, array('post_data' => $post_data));
+				$validated = false;
+				$error_msg .= '<li>Video adrese ir ievadīta nepareizi</li>';
 			}
+
 			// If tests OK, try to save
-			else if($tutorial->save())
-			{
-				Session::set_flash('success', 'Pamācība ir veiksmīgi pievienota!');
-				Response::redirect('/tutorials/'.$tutorial->id);
+			if($validated) {
+				if($tutorial->save())
+				{
+					Session::set_flash('success', 'Pamācība ir veiksmīgi pievienota!');
+					Response::redirect('/tutorials/'.$tutorial->id);
+				}
 			}
 			// If couldn't save for some unknown reason
 			else {
@@ -183,8 +218,10 @@ class Controller_Tutorials extends Controller_Base
 				else {
 					$post_data['visibility0'] = 'checked'; }
 
+				$error_msg = 'Neizdevās pievienot pamācību šādu iemeslu dēļ:<ul>' . $error_msg . '</ul>';
+
 				// Set flash and reload register page
-				Session::set_flash('error', 'Neizdevās pievienot pamācību. (Servera kļūda) <br> Mēģiniet vēlreiz.');
+				Session::set_flash('error', $error_msg);
 				Response::redirect('/tutorials/create/'.$tutorial->id, array('post_data' => $post_data));
 			}
 		}
@@ -202,6 +239,7 @@ class Controller_Tutorials extends Controller_Base
 	public function action_edit($tutorial_id)
 	{	
 		
+
 		$categories = DB::select('*')->from('categories')->order_by('title','ASC')->execute()->as_array();
 		$tutorial = Model_Tutorial::find_by_id($tutorial_id);
 		if(!count($tutorial)) { // No tutorials found, might be deleted.
@@ -216,6 +254,9 @@ class Controller_Tutorials extends Controller_Base
 		// Try to update tutorial
 		if(Input::method() == 'POST')
 		{	
+			$validated = true;
+			$error_msg = '';
+
 			// Get POST data
 			$title = Input::post('title');
 			$description = Input::post('description');
@@ -232,16 +273,67 @@ class Controller_Tutorials extends Controller_Base
 			$tutorial->category_id = $category_id;
 			$tutorial->is_public = $is_public;
 
+			if(mb_strlen($title)>20||mb_strlen($title)<5) 
+			{
+				$validated = false;
+				$error_msg .= '<li>Virsrakstam jābūt 5-50 simbolus garam</li>';
+			}
+
+			if(mb_strlen($description)<30||mb_strlen($description)>400) {
+				$validated = false;
+				$error_msg .= '<li>Aprakstam jābūt 30-400 simbolus garam</li>';
+			}
+
+			if(mb_strlen($contents)>2000) {
+				$validated = false;
+				$error_msg .= '<li>Papildus informācija nevar būt garāka par 2000 simpoliem</li>';
+			}
+
+			// Look for category
+			$categorie = DB::select('*')->from('categories')->where('id',$category_id)->execute()->as_array();
+			if(!count($categorie))
+			{
+				$validated = false;
+				$error_msg .= '<li>Nav naorādīta pareiza video kategorija</li>';
+			}
+
+			if(is_null($is_public))
+			{
+				$validated = false;
+				$error_msg .= '<li>Nav norādīta pamācības redzamība</li>';
+			}
+
 			// If link was not valid
 			if(!Helper::decode_video_url($videourl)) {
-				Session::set_flash('error', 'Video adrese ir ievadīta nepareizi.');
-				Response::redirect('/tutorials/edit/'.$tutorial->id);
+				$validated = false;
+				$error_msg .= '<li>Video adrese ir ievadīta nepareizi</li>';
 			}
-			// Else try to save it
-			else if($tutorial->save())
-			{
-				Session::set_flash('success', 'Pamācība ir veiksmīgi sglabāta!');
-				Response::redirect('/tutorials/'.$tutorial->id);
+
+			if($validated) {
+				// Try to save it
+				if($tutorial->save())
+				{
+					Session::set_flash('success', 'Pamācība ir veiksmīgi sglabāta!');
+					Response::redirect('/tutorials/'.$tutorial->id);
+				}
+			}
+			else {
+				// Write data to allow retrying without loosing entered form data
+				$post_data['title'] = $title;
+				$post_data['description'] = $description;
+				$post_data['contents'] = $contents;
+				$post_data['videourl'] = $videourl;
+				$post_data['category'] = $category_id;
+				if($is_public) {
+					$post_data['visibility1'] = 'checked'; }
+				else {
+					$post_data['visibility0'] = 'checked'; }
+
+				$error_msg = 'Neizdevās pievienot pamācību šādu iemeslu dēļ:<ul>' . $error_msg . '</ul>';
+
+				// Set flash and reload register page
+				Session::set_flash('error', $error_msg);
+				Response::redirect('/tutorials/edit/'.$tutorial->id, array('post_data' => $post_data, 'categories' => $categories));
 			}
 		}
 

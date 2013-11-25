@@ -170,22 +170,6 @@ div.login h2 {
 	margin-right: 10px;
 }
 
-.explore .feed .listitem .details{
-	padding-bottom: 4px;
-	border-bottom: 1px solid #ddd;
-	margin-left: 0;	
-}
-
-.explore .feed .listitem .description {
-	height: 150px;
-}
-
-.explore .feed .listitem .title h2{
-	
-	display: inline; 
-}
-
-
 .explore .sidebar ul a {
 	text-decoration: none;
 }
@@ -324,6 +308,16 @@ div.login h2 {
   .user .feed .listitem .details{
 		margin-left: 0;	
 	}
+
+	.explore .category {
+		display: block;
+		vertical-align: middle;
+		margin-bottom: 10px;
+	}
+
+	.explore .feed {
+		margin-left: 10px;
+	}
 }
 
 @media (max-width: 767px) {
@@ -339,12 +333,6 @@ div.login h2 {
 	.explore .feed{
 		margin-left: 10px;
 	}
-
-	.explore .category {
-		display: block;
-		vertical-align: middle;
-		margin-bottom: 10px;
-}
 
 }
 

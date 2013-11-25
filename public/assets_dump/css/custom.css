@@ -121,6 +121,7 @@ body {
 
 .explore .feed .listitem .title h2{
 	display: block; 
+	font-size: 24px;
 }
 
 
@@ -251,6 +252,9 @@ body {
   }
   .user .feed .listitem .details{
 		margin-left: 0;	
+	}
+  .explore .feed .listitem .title h2{
+	font-size: 26px;
 	}
 }
 

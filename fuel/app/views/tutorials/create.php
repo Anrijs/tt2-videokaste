@@ -9,7 +9,7 @@
 <?php echo Form::open(array('id' => 'new_tutorial')) ?>
 <fieldset>
   <div class="form-group">
-    <label for="exampleInputEmail1">Virsraksts</label>
+    <label for="exampleInputEmail1">Virsraksts (5-60 simboli</label>
     <input type="text" class="form-control" id="title" name="title" placeholder="Pamācības virsraksts" value="<?php echo $post_data['title']; ?>">
   </div>
 
@@ -25,20 +25,23 @@
   </div>
 
   <div class="form-group">
-    <label for="exampleInputPassword1">Papildus informācija par video (neobligāts, 0-3000 simboli)</label>
+    <label for="exampleInputPassword1">Papildus informācija par video (neobligāts, 0-2000 simboli)</label>
     <textarea class="form-control" id="contents" name="contents" placeholder="Piebildes par video, papildus informācija, saites... Tas ko varēs redzēt pamācības lapā zem video."><?php echo $post_data['contents']; ?></textarea>
   </div>
 
   <div class="form-group">
     <label for="category"> Kategorija </label>
     <select class="form-control" id="category" name="category">
-      <option value="<?php echo $post_data['category']; ?>" disabled selected>Izvēlies kategoriju</option>
+      <option value="" selected disabled >Izvēlies kategoriju</option>
       <?php foreach ($categories as $category) { ?>
-        <option value="<?php echo $category['id']; ?>"><?php echo $category['title']; ?></option>
+        <option value="<?php echo $category['id']; ?>"
+                <?php if($category['id']==$post_data['category']) {
+                  echo ' selected';
+                }?>>
+                <?php echo $category['title']; ?></option>
       <?php } ?>
     </select>
   </div>
-
   <div class="form-group">
     <input type="radio" name="visibility" id="public" value="1" <?php echo $post_data['visibility1']; ?> ></input><label style="margin-right:16px;" for="public" >Redzams visiem </label>
     <input type="radio" name="visibility" id="private" value="0" <?php echo $post_data['visibility0']; ?> ></input><label for="private">Redzams tikai reģistrētiem lietotājiem </label>
@@ -59,6 +62,7 @@
       title: {
         required: true,
         minlength: 5,
+        maxlength
       },
       description: {
         required: true,
@@ -78,7 +82,7 @@
       },
       contents: {
         required: false,
-        maxlength: 3000,
+        maxlength: 2000,
       }
     },
     messages: {
