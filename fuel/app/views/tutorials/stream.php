@@ -1,6 +1,7 @@
     <div class="contents index"> <!-- class="container" -->
-        
         <div class="feed">
+                <div class="alert alert-danger" style="font-size:32px; margin:24px; padding:24px;">Jāsataisa pareiza atlase! </div>
+
           <?php
               if(Session::get_flash('error')) {
               ?>
@@ -32,24 +33,24 @@
           <?php foreach ($tutorials as $tutorial) { ?>
         <div class="listitem"> 
     
-              <img src="http://placehold.it/640x360" class="thumbnail">
+          <img src="http://img.youtube.com/vi/<?php echo Helper::decode_video_url($tutorial->videourl)?>/mqdefault.jpg" class="thumbnail">
                 <?php if($current_user['group_id']>=50) { ?>
-                <a href="/tutorials/edit/<?php echo $tutorial['id']; ?>"><span class="glyphicon glyphicon-pencil"></span></a>
+                <a href="/tutorials/edit/<?php echo $tutorial->id; ?>"><span class="glyphicon glyphicon-pencil"></span></a>
                 <?php } ?>
-                <a href="/tutorials/<?php echo $tutorial['id']; ?>" class="title"><h2 class="pull-left;"><?php echo $tutorial['title']; ?></h2></a>
-                <a href="/users/<?php echo $tutorial['author_id']; ?>" class="author">by <?php echo Helper::visual_name($tutorial['author_id']); ?></a>
-                <a href="/explore/<?php echo $tutorial['category_id']; ?>" class="v_category">(<?php echo $tutorial['category']; ?>)</a>
+                <a href="/tutorials/<?php echo $tutorial->id; ?>" class="title"><h2><?php echo $tutorial->title; ?></h2></a>
+                <a href="/u/<?php echo $tutorial->user->username; ?>" class="author">by <?php echo Helper::visual_name($tutorial->author_id); ?></a>
+                <a href="/explore/<?php echo $tutorial->category_id; ?>" class="v_category">(<?php echo $tutorial->category->title; ?>)</a>
                 <p class="description">
-                  <?php echo $tutorial['description']; ?>
+                  <?php echo $tutorial->description; ?>
                </p>
                
                <div class="details">
                   <span class="stats">
-                    <span class="glyphicon glyphicon-eye-open" ></span> <?php echo $tutorial['views']; ?>
+                    <span class="glyphicon glyphicon-eye-open" ></span> <?php echo $tutorial->views; ?>
                     <span class="glyphicon glyphicon glyphicon-comment" ></span> 26 
                   </span>
                   <span class="minibuttons">
-                    <?php echo date('c',$tutorial['created_at']); ?>
+                    <?php echo date('c',$tutorial->created_at); ?>
                   </span>
                </div>
             </div>   

@@ -60,9 +60,9 @@
 
           <ul class="nav navbar-nav pull-right">
             <?php if($current_user): ?>
-            <li><a href="/users/<?php echo $current_user['id']; ?>">
+            <li><a href="/u/<?php echo $current_user->username; ?>">
               <?php 
-                echo  Helper::visual_name_nav($current_user['id']);
+                echo  Helper::visual_name_nav($current_user->id);
               ?>
             </a>
             </li>
@@ -89,9 +89,11 @@
           </ul> -->
         </div> <!--/.nav-collapse -->
       </div>
+
     </div>
 
     <?php echo $content; ?>
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

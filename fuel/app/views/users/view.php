@@ -1,16 +1,12 @@
     <div class="contents view user"> <!-- class="container" -->
 
       <div class="feed">
-        <!-- Listitem start -->
-
-
-            <h2 class="pull-left;">%User name%</h2>
-
+      
         <!-- Listitem start -->
         <div class="listitem"> 
               
             <img src="http://placehold.it/640x360" class="thumbnail hidden-xs hidden-sm">
-            <a href="tutorial.php" class="title"><h2 class="pull-left;">%Tutorial name%</h2></a>
+            <a href="tutorial.php" class="title"><h2 class="pull-left">%Tutorial name%</h2></a>
             <a href="user.php" class="author">by %author name%</a>
             <p class="description">
              %description_short%

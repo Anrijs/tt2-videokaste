@@ -4,9 +4,9 @@
         <!-- Listitem start -->
 
 
-            <h2 class="pull-left;">
+            <h2>
               <?php 
-                if($author['id']==$current_user['id']||$current_user['group_id']>=50) {
+                if($tutorial['author_id']==$current_user['id']||$current_user['group_id']>=50) {
                   echo '<a href="/tutorials/edit/'.$tutorial['id'].'"<span style="font-size:0.6em;" class="glyphicon glyphicon-pencil"></span></a>';
                 }
                 echo ' '.$tutorial['title']; 
@@ -21,11 +21,12 @@
             <?php
               }
             ?>
-            <a href="user.php" class="author">by <?php echo Helper::visual_name($author['id']); ?></a>
+            <a href="/u/<?php echo $tutorial->user['username']; ?>" class="author">by <?php echo Helper::visual_name($tutorial['author_id']); ?></a>
               <span class="stats">
                 <span class="glyphicon glyphicon-eye-open" ></span> <?php echo $tutorial['views']; ?>
               </span>
             <p class="description">
+            <?php echo $tutorial['description']; ?>
               <div class="h_iframe">
                   <img class="ratio" src="http://placehold.it/16x9"/>
                   <?php 
@@ -34,28 +35,20 @@
                   <iframe src="//www.youtube.com/embed/<?php echo Helper::decode_video_url($videourl); ?>" frameborder="0" allowfullscreen></iframe>
                   <?php echo $tutorial['videourl']; ?>
               </div>
-             <?php echo $tutorial['contents']; ?>
+              <?php if($tutorial['contents']) { ?>
+              <h3>Pamācības apraksts</h3>
+              <?php echo $tutorial['contents'];} ?>
            </p>
             
         <!-- Listitem end -->
-        <div class="well"> 
-        	<p>
-            <pre>
-              <?php 
-
-                print_r(Cookie::get());
-               ?>
-            </pre>
-        	</p>
-        </div>
       </div>
 
       <div class="sidebar">
         <div class="profile">
         	<img src="http://placehold.it/180x180">
-        	<h3><?php echo Helper::visual_name($author['id']); ?></h3>
+        	<h3><?php echo Helper::visual_name($tutorial['author_id']); ?></h3>
         	<p class="lead">
-        	  <?php echo $author['details']; ?>
+        	  <?php echo $tutorial->user['details']; ?>
         	  Nothing here....
         	</p>
         	<div class="stats">

@@ -9,5 +9,12 @@ class Model_Comment extends \Orm\Model
 		'content'
 	);
 
+	// protected static $_belongs_to = array(
+	// 'user' => array(
+	//     'key_from' => 'author_id',
+	//     'model_to' => 'Model_User',
+	//     'key_to' => 'id')
+    // );
+
 
 }

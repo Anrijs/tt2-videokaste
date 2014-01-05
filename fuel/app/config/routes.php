@@ -11,7 +11,7 @@ return array(
 	'tutorials/edit/:id' => 'tutorials/edit/$1',
 	'tutorials/delete/:id' => 'tutorials/delete/$1',
 	'tutorials/:id' => 'tutorials/view/$1',
-	'user/:id' => 'users/view/$1',
+	'u/:username' => 'users/view/$1',
 	
 	'hello(/:name)?' => array('welcome/hello', 'name' => 'hello'),
 );

@@ -18,7 +18,7 @@ class Controller_Tutorials extends Controller_Base
 		$error_msg = '';
 		$search_users = '';
 		// If nothing found for this id and id not NULL, to allow all tuts page
-		if(!count(DB::select('*')->from('categories')->where('id', $category_id)->execute())&&$this->param('id')!==NULL) {
+		if(!count(Model_Category::find($this->param('id')))&&$this->param('id')!==NULL) {
 			$error_msg .= '<div class="well">';
 			$error_msg .= '<h2> Sorry, but this category doesn\'t exisy (yet)</h2>';
 			$error_msg .= '<p class="hidden-xs"> <span class="glyphicon glyphicon-chevron-left"> </span> Please choose any of categories from list at left side of the page! </p>';
@@ -26,38 +26,39 @@ class Controller_Tutorials extends Controller_Base
 			$error_msg .= '</div>';
 		}
 
-		//Make subquery for author name
-		$exp = DB::expr('`tutorials`.author_id');
-		$mini_author = DB::select('username')->from('users')->where('id',$exp);
-
-		// Another subquery for category name
-		$exp2 = DB::expr('`tutorials`.category_id');
-		$mini_category = DB::select('title')->from('categories')->where('id',$exp2);
-
 		// If search set, go for it.   This should be moved to search action!
 		if(isset($_GET['srch'])&&$_GET['srch']!==NULL) {
 			$term = $_GET['srch'];
-			// Search by title and description keywords
-			$tutorials = DB::select('*', array($mini_author, 'username'),array($mini_category, 'category'))->from('tutorials')->
-				where('title', 'LIKE', '%'.$term.'%')->
-				or_where('description', 'LIKE', '%'.$term.'%')->
-				order_by('created_at','DESC')->execute()->as_array();
-			$search_users = DB::select('*')->from('users')->where('username', 'LIKE', '%'.$term.'%')->order_by('username', 'ASC')->execute()->as_array();
 			$active_category = '0';
+
+			$tutorials = $tutorial = Model_Tutorial::find('all', array(
+				'where' => array(
+    				    array('title', 'LIKE', '%'.$term.'%'),
+    				    'or' => array(
+    				        array('description', 'LIKE', '%'.$term.'%'),
+    				    ),
+    			),
+				"related" => array("user", "category"),
+				'order_by' => array('created_at' => 'desc')));
+
 		}
 		// Else if category is set, select tutorials from it
 		else if($this->param('id')) {
-			$tutorials = DB::select('*', array($mini_author, 'username'),array($mini_category, 'category'))->from('tutorials')->where('category_id', $this->param('id'))->order_by('created_at','DESC')->execute()->as_array();
+			$tutorials = $tutorial = Model_Tutorial::find('all', array(
+				"where" => array("category_id" => $this->param('id')),
+				"related" => array("user", "category"),
+				'order_by' => array('created_at' => 'desc')));
+			//$tutorials = where('category_id', $this->param('id'));
 			$active_category = $this->param('id');
 		}
 		// Else - nothing is set, show everything i've got
 		else {
-			$tutorials = DB::select('*', array($mini_author, 'username'),array($mini_category, 'category'))->from('tutorials')->order_by('created_at','DESC')->execute()->as_array();
+			$tutorials = Model_Tutorial::find('all', array("related" => array("user", "category"),'order_by' => array('created_at' => 'desc')));
 			$active_category = '0';
 		}
 
 		// Get full category list
-		$categories = DB::select('*')->from('categories')->order_by('title','ASC')->execute()->as_array();
+		$categories = Model_Category::find('all');
 
 		$this->template->navbar = array('explore' => 'active');
 		$this->template->title = 'Explore';
@@ -76,16 +77,6 @@ class Controller_Tutorials extends Controller_Base
 			Response::redirect('/');
 		} 
 
-		// Make subquery to select users followed by current_user
-		$mini = DB::select('following_id')->from('followers')->where('follower_id', $this->current_user->id);
-		$exp = DB::expr('`tutorials`.author_id');
-		// Now select their real usernames
-		$mini_author = DB::select('username')->from('users')->where('id',$exp);
-
-		// Subquery to get category data for tutorial
-		$exp2 = DB::expr('`tutorials`.category_id');
-		$mini_category = DB::select('title')->from('categories')->where('id',$exp);
-
 		// Paginate
 		$page_limit=Config::get('paginate_single'); // Page limit from settings
 		$paginate=0;	// Tutorial offset for SQL
@@ -98,12 +89,25 @@ class Controller_Tutorials extends Controller_Base
 			$paginate=0;
 		}
 
+
+		// Make subquery to select users followed by current_user
+		$mini = DB::select('following_id')->from('followers')->where('follower_id', $this->current_user->id);
+		$exp = DB::expr('`tutorials`.author_id');
+		// Now select their real usernames
+		$mini_author = DB::select('username')->from('users')->where('id',$exp);
+
+		// Subquery to get category data for tutorial
+		$exp2 = DB::expr('`tutorials`.category_id');
+		$mini_category = DB::select('title')->from('categories')->where('id',$exp);
+
 		// Get tutorials count, then calculate how many pages there will be (used to disable buttons)
 		$tutorials_count = DB::select('*')->from('tutorials')->where('author_id', 'IN', $mini)->order_by('created_at','DESC')->execute()->as_array();
 		$page_count=floor(count($tutorials_count)/$page_limit)+1;
 
 		// Select tutorials from page
-		$tutorials = DB::select('*',array($mini_author, 'username'),array($mini_category, 'category'))->from('tutorials')->where('author_id', 'IN', $mini)->order_by('created_at','DESC')->limit($page_limit)->offset($paginate)->execute()->as_array();
+		//$tutorials = DB::select('*',array($mini_author, 'username'),array($mini_category, 'category'))->from('tutorials')->where('author_id', 'IN', $mini)->order_by('created_at','DESC')->limit($page_limit)->offset($paginate)->execute()->as_array();
+		
+		$tutorials = Model_Tutorial::find('all', array("related" => array("user", "category"),'order_by' => array('created_at' => 'desc'),'limit' => $page_limit, 'offset' => $paginate));
 		
 		$this->template->navbar = array('stream' => 'active');
 		$this->template->title = 'Videokaste.lv - '.$this->current_user->username;
@@ -372,18 +376,15 @@ class Controller_Tutorials extends Controller_Base
 
 	public function action_view($tutorial_id)
 	{
-		// Select categories and tutorial
-		$categories = DB::select('*')->from('categories')->order_by('title','ASC')->execute()->as_array();
-		$tutorial = Model_Tutorial::find_by_id($tutorial_id);
+		$tutorial = Model_Tutorial::find($tutorial_id, array("related" =>
+			    array("user")
+		));
 
 		// If this tutorial doesnt exist, set flash
 		if(!count($tutorial)) {
 			Session::set_flash('error', 'Pamācība netika artasta. Iespējams, tā ir izdzēsta, vai arī nekad nav eksistējusi.');
 			Response::redirect_back('/stream', 'refresh');
 		}
-		
-		// Get author data
-		$author = Model_User::find_by_id($tutorial['author_id']);
 		
 		// Set up view cookie
 		$cookie_id='vk_watched_'.$tutorial_id;
@@ -401,9 +402,7 @@ class Controller_Tutorials extends Controller_Base
 		$this->template->navbar = array('explore' => 'active');
 		$this->template->title = 'View Tutorial';
 		$this->template->content = View::forge('tutorials/view', array(
-			'categories' => $categories,
-			'tutorial' => $tutorial,
-			'author' => $author
+			'tutorial' => $tutorial
 			));
 	}
 

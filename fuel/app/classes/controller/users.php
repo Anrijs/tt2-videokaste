@@ -3,9 +3,9 @@
 class Controller_Users extends Controller_Base
 {
 	// User profile page
-	public function action_view($id = null)
+	public function action_view($username = null)
 	{
-		$user = Model_User::find($id);
+		$user = Model_User::find_by_username($username);
 
 		$this->template->navbar = array('explore' => 'active');
 		$this->template->title = $user->username.'\'s profile ';
@@ -64,7 +64,7 @@ class Controller_Users extends Controller_Base
 			$error_msg='';
 			// Server-side validation
 			// Check username length
-			if(mb_strlen($post_username)>20||mb_strlen($post_username)<5)
+			if(mb_strlen($post_username)>20||mb_strlen($post_username)<4)
 			{
 				$validated = false;
 				$error_msg .='<li>Lietotājvārdam jābūt 3-20 simbolus garam </li>';

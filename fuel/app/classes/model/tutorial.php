@@ -28,13 +28,25 @@ class Model_Tutorial extends \Orm\Model
 	);
 	protected static $_table_name = 'tutorials';
 	
-	protected static $_has_many = array(
-    'comments' => array(
-        'key_from' => 'id',
-        'model_to' => 'Model_Comment',
-        'key_to' => 'post_id',
-        'cascade_save' => true,
-        'cascade_delete' => false,
-    )
-	);
+	//protected static $_has_many = array(
+    //'comments' => array(
+    //    'key_from' => 'id',
+    //    'model_to' => 'Model_Comment',
+    //    'key_to' => 'post_id',
+    //    'cascade_save' => true,
+    //    'cascade_delete' => false,
+    //)
+	//);
+
+	protected static $_belongs_to = array(
+	'user' => array(
+	    'key_from' => 'author_id',
+	    'model_to' => 'Model_User',
+	    'key_to' => 'id'
+    ),
+    'category' => array(
+	    'key_from' => 'category_id',
+	    'model_to' => 'Model_Category',
+	    'key_to' => 'id'
+    ));
 }
