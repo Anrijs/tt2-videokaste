@@ -24,11 +24,32 @@
       <script src="../../assets/js/html5shiv.js"></script>
       <script src="../../assets/js/respond.min.js"></script>
     <![endif]-->
-
   </head>
 
   <body>
 
+
+    <?php 
+    if($current_user) {
+      Config::set('language', $current_user->language);
+    }
+    else {
+      if(!Cookie::get("videokaste_language")=='lv') {$lang = 'en';
+        $head = Input::headers( 'Accept-Language');
+        if (strpos($head, 'lv')) {
+          $lang = 'lv';
+        }
+
+        Config::set('language', $lang);
+        $cookie_time=Config::get('cookie_language_time');
+        Cookie::set('language', $lang, $cookie_time);
+      }
+      else {
+        Config::set('language', Cookie::get("videokaste_language"));
+      }
+    }
+
+     ?>
         <!-- Static navbar -->
     <div class="navbar navbar-default navbar-fixed-top">
       <div > <!-- class="container" -->
@@ -44,13 +65,14 @@
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class='<?php echo Arr::get($navbar, "stream" ); ?>'><a href="/"><?php if($current_user) {echo 'Jaunumi';} else {echo 'Sākums';} ?></a></li>
-            <li class='<?php echo Arr::get($navbar, "explore" ); ?>'><a href="/explore">Pamācības</a></li>
+            <li class='<?php echo Arr::get($navbar, "stream" ); ?>'><a href="/"><?php if($current_user) {echo __("STREAM");} else {echo __("HOME");} ?></a></li>
+            <li class='<?php echo Arr::get($navbar, "explore" ); ?>'><a href="/explore"><?php echo __("TUTORIALS"); ?></a></li>
           </ul>
           <div class="col-sm-3 col-sm-3">
             <form class="navbar-form" role="search">
+            <input type="hidden" name="<?php echo \Config::get('security.csrf_token_key');?>" value="<?php echo \Security::fetch_token();?>" />
               <div class="input-group">
-                <input type="text" class="form-control" placeholder="Meklēt..." name="srch-term" id="srch-term">
+                <input type="text" class="form-control" placeholder="<?php echo __("SEARCH_PLACEHOLDER"); ?>" name="srch-term" id="srch-term">
                 <div class="input-group-btn">
                   <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
                 </div>
@@ -59,6 +81,13 @@
           </div>
 
           <ul class="nav navbar-nav pull-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?php echo __("LANGUAGE"); ?></a>
+              <ul class="dropdown-menu">
+                <li><a href="/lang/lv">LV</a></li>
+                <li><a href="/lang/en">EN</a></li>
+              </ul>
+            </li>
             <?php if($current_user): ?>
             <li><a href="/u/<?php echo $current_user->username; ?>">
               <?php 
@@ -66,19 +95,20 @@
               ?>
             </a>
             </li>
+            
             <li><a href="/tutorials/create"><span class="glyphicon glyphicon-plus-sign"></span></a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="#">Manas Pamācības</a></li>
+                <li><a href="/u/<?php echo $current_user['username']; ?>"><?php echo __("MY_TUTORIALS"); ?></a></li>
                 <li class="divider"></li>
-                <li><a href="#">Par projektu</a></li>
-                <li><a href="#">Uzstādijumi</a></li>
-                <li><a href="/users/logout">Iziet</a></li>
+                <li><a href="/about"><?php echo __("ABOUT"); ?></a></li>
+                <li><a href="/edit/"><?php echo __("SETTINGS"); ?></a></li>
+                <li><a href="/users/logout"><?php echo __("LOG_OUT"); ?></a></li>
               </ul>
             </li>
           <?php else: ?>
-            <li class='<?php echo Arr::get($navbar, "login" ); ?>'><a href="/users/login">Ienākt</a></li>
+            <li class='<?php echo Arr::get($navbar, "login" ); ?>'><a href="/users/login"><?php echo __("LOG_IN"); ?></a></li>
           <?php endif ?>
           </ul>
           <!--- 
@@ -91,7 +121,7 @@
       </div>
 
     </div>
-
+    
     <?php echo $content; ?>
 
     <!-- Bootstrap core JavaScript

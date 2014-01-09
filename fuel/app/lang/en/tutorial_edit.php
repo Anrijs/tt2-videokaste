@@ -1,0 +1,46 @@
+<?php
+
+return array(
+	'TUTORIAL_TUTORIAL' => 'Tutorial',
+	'TUTORIAL_DELETED' => 'was successfully deleted',
+	'TUTORIAL_RETURN' => 'return to home page',
+    'CREATE_TUTORIAL' => 'Create tutorial',
+    'TITLE_PARAMS' => 'Title must be 5-50 symbols long',
+    'DESCRIPTION_PARAMS' => 'Description must be 30-400 symbols long',
+    'CONTENTS_PARAMS' => 'Additional information can\'t be longer that 2000 symbols',
+    'CATEGORY_PARAMS' => 'Category is required',
+    'VISIBILITY_PARAMS' => 'Visibility is required',
+    'VIDEO_URL_PARAMS' => 'Video link is invalid',
+    'NEW_TUTORIAL_SUCCESS' => 'Tutorial added successfully!',
+    'TUTORIAL_ERROR' => 'Couldn\'t add tutorial for folowing reasons:',
+    'EDIT_TUTORIAL' => 'Edit Tutorial',
+    'DELETE_TUTORIAL' => 'Delete tutorial',
+    'DELETE_TUTORIAL_CONFIRMATION' => 'Are You sure You want to delete this tutorial? This action can not be undone!',
+    
+    'TUTORIAL_EDIT_TITLE' => 'Tutorial title',
+    'TUTORIAL_EDIT_DESCRIPTION' => 'Short Description of tutorial (30-400 symbols)',
+    'TUTORIAL_EDIT_URL' => 'Video address',
+    'TUTORIAL_EDIT_CONTENTS' => 'Additional information about video (0-2000 symbols)',
+    'TUTORIAL_EDIT_CATEGORY' => 'Category',
+    'TUTORIAL_EDIT_CATEGORY_BLANK' => 'Select category',
+    'TUTORIAL_EDIT_LANGUAGE' => 'Tutorial language',
+    'TUTORIAL_EDIT_VISIBILITY' => 'Tutorial visibility',
+
+    'TUTORIAL_EDIT_TITLE_PLACEHOLDER' => 'Tutorial title',
+    'TUTORIAL_EDIT_DESCRIPTION_PLACEHOLDER' => 'Short Description of tutorial. This will be text you see when searching for tutorials',
+    'TUTORIAL_EDIT_URL_PLACEHOLDER' => 'http://www.youtube.com/watch?v=xxxxxxxxxxx',
+    'TUTORIAL_EDIT_CONTENTS_PLACEHOLDER' => 'Additional information about video. This will be visible below video',
+
+    'VISIBILITY_PUBLIC' => 'Public',
+    'VISIBILITY_PRIVATE' => 'Registred users only',
+
+	'TUTORIAL_TITLE_REQUIRED' => 'Title is required',
+    'TUTORIAL_TITLE_MINLENGTH' => 'Title must be at least 5 symbols long',
+    'TUTORIAL_DESCRIPTION_REQUIRED' => 'Description is required',
+    'TUTORIAL_DESCRIPTION_MINLENGTH' => 'Description must be at least 30 symbols long',
+    'TUTORIAL_DESCRIPTION_MAXLENGTH' => 'Description can\'t be longer than 400 symbols',
+    'TUTORIAL_VIDEO_URL_REQUIRED' => 'Video address is required',
+    'TUTORIAL_VIDEO_URL_URL' => 'Video address is not valid',
+    'TUTORIAL_CONTENTS_MAXLENGTH' => 'Additional information can\'t be longer than 2000 symbols',
+    'TUTORIAL_CATEGORY_REQUIRED' => 'Video category is required',
+); 

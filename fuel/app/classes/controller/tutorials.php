@@ -2,6 +2,7 @@
 
 class Controller_Tutorials extends Controller_Base
 {
+
 	// If user not loged in, redirect to landing page, else redirect to users stream
 	public function action_index() {
 		if(!$this->current_user) {
@@ -12,6 +13,7 @@ class Controller_Tutorials extends Controller_Base
 
 	public function action_explore($category_id = null)
 	{
+		Lang::load('tutorial_explore');
 		// TODO: paginate
 
 		//Check if it's a valid category
@@ -20,9 +22,9 @@ class Controller_Tutorials extends Controller_Base
 		// If nothing found for this id and id not NULL, to allow all tuts page
 		if(!count(Model_Category::find($this->param('id')))&&$this->param('id')!==NULL) {
 			$error_msg .= '<div class="well">';
-			$error_msg .= '<h2> Sorry, but this category doesn\'t exisy (yet)</h2>';
-			$error_msg .= '<p class="hidden-xs"> <span class="glyphicon glyphicon-chevron-left"> </span> Please choose any of categories from list at left side of the page! </p>';
-			$error_msg .= '<p class="visible-xs"> <span class="glyphicon glyphicon-chevron-up"> </span> Please choose any of categories from list at top of the page! </p>';
+			$error_msg .= '<h2> '.__('CATEGORY_NOT_EXIST').'</h2>';
+			$error_msg .= '<p class="hidden-xs"> <span class="glyphicon glyphicon-chevron-left"> </span> '.__('CHOOSE_CATEGORY').__('LEFT_SIDE_OF_PAGE').' </p>';
+			$error_msg .= '<p class="visible-xs"> <span class="glyphicon glyphicon-chevron-up"> </span>'.__('CHOOSE_CATEGORY').__('TOP_OF_PAGE').' </p>';
 			$error_msg .= '</div>';
 		}
 
@@ -73,62 +75,43 @@ class Controller_Tutorials extends Controller_Base
 
 	public function action_stream()
 	{
+		Lang::load('tutorial_stream');
 		if(!$this->current_user) {
 			Response::redirect('/');
 		} 
 
-		// Paginate
-		$page_limit=Config::get('paginate_single'); // Page limit from settings
-		$paginate=0;	// Tutorial offset for SQL
 
-		// If page is set, change current page
-		if(isset($_GET['page'])) {
-			$paginate=($_GET['page']-1)*$page_limit;
-		}
-		if($paginate<1) {
-			$paginate=0;
-		}
+        $followers = Model_Follower::find('all', array(
+        	'where' => array(
+        		'follower_id' => $this->current_user->id), 
+        	'related' => array(
+        		'user' => array(
+        			'related' => array(
+        				'tutorials',  ))), 'limit' => 20));
 
-
-		// Make subquery to select users followed by current_user
-		$mini = DB::select('following_id')->from('followers')->where('follower_id', $this->current_user->id);
-		$exp = DB::expr('`tutorials`.author_id');
-		// Now select their real usernames
-		$mini_author = DB::select('username')->from('users')->where('id',$exp);
-
-		// Subquery to get category data for tutorial
-		$exp2 = DB::expr('`tutorials`.category_id');
-		$mini_category = DB::select('title')->from('categories')->where('id',$exp);
-
-		// Get tutorials count, then calculate how many pages there will be (used to disable buttons)
-		$tutorials_count = DB::select('*')->from('tutorials')->where('author_id', 'IN', $mini)->order_by('created_at','DESC')->execute()->as_array();
-		$page_count=floor(count($tutorials_count)/$page_limit)+1;
-
-		// Select tutorials from page
-		//$tutorials = DB::select('*',array($mini_author, 'username'),array($mini_category, 'category'))->from('tutorials')->where('author_id', 'IN', $mini)->order_by('created_at','DESC')->limit($page_limit)->offset($paginate)->execute()->as_array();
-		
-		$tutorials = Model_Tutorial::find('all', array("related" => array("user", "category"),'order_by' => array('created_at' => 'desc'),'limit' => $page_limit, 'offset' => $paginate));
-		
 		$this->template->navbar = array('stream' => 'active');
 		$this->template->title = 'Videokaste.lv - '.$this->current_user->username;
 		$this->template->content = View::forge('tutorials/stream', array(
-				'tutorials' => $tutorials, 'page_count' => $page_count
+				'followers' => $followers, 
 				));
 	}
 
 	public function action_create()
 	{	
+		Lang::load('tutorial_edit');
 		// Data that will contain input values in case of registration failure
 		$post_data['title'] = '';
 		$post_data['description'] = '';
 		$post_data['contents'] = '';
 		$post_data['videourl'] = '';
 		$post_data['category'] = '';
-		$post_data['visibility0'] = '';
-		$post_data['visibility1'] = '';
+		$post_data['visibility0'] = false;
+		$post_data['visibility1'] = false;
+		$post_data['language_en'] = false;
+		$post_data['language_lv'] = false;
 
 		// If have POST data atempt tutorial create
-		if(Input::method() == 'POST')
+		if(Input::method() == 'POST'&&Security::check_token())
 		{
 			$validated = true;
 			$error_msg = '';
@@ -139,6 +122,7 @@ class Controller_Tutorials extends Controller_Base
 			$videourl = Input::post('videourl');
 			$category_id = Input::post('category');
 			$is_public = Input::post('visibility');
+			$language = Input::post('language');
 
 			// Write POST data to new tutorial without saving it
 			$tutorial = Model_Tutorial::forge()->set(array(
@@ -149,37 +133,38 @@ class Controller_Tutorials extends Controller_Base
 				'category_id' => $category_id,
 				'author_id' => $this->current_user['id'],
 				'is_public' => $is_public,
-				'views' => '0' 
+				'views' => '0',
+				'language' => $language,
 			));
 
-			if(mb_strlen($title)>20||mb_strlen($title)<5) 
+			if(mb_strlen($title)>50||mb_strlen($title)<5) 
 			{
 				$validated = false;
-				$error_msg .= '<li>Virsrakstam jābūt 5-50 simbolus garam</li>';
+				$error_msg .= '<li>'.__('TITLE_PARAMS').'</li>';
 			}
 
 			if(mb_strlen($description)<30||mb_strlen($description)>400) {
 				$validated = false;
-				$error_msg .= '<li>Aprakstam jābūt 30-400 simbolus garam</li>';
+				$error_msg .= '<li>'.__('DESCRIPTION_PARAMS').'</li>';
 			}
 
 			if(mb_strlen($contents)>2000) {
 				$validated = false;
-				$error_msg .= '<li>Papildus informācija nevar būt garāka par 2000 simpoliem</li>';
+				$error_msg .= '<li>'.__('CONTENTS_PARAMS').'</li>';
 			}
 
 			// Look for category
-			$categorie = DB::select('*')->from('categories')->where('id',$category_id)->execute();
+			$categorie = Model_Category::find('first', array('where' => array(array('id', $category_id))));
 			if(!count($categorie))
 			{
 				$validated = false;
-				$error_msg .= '<li>Nav naorādīta pareiza video kategorija</li>';
+				$error_msg .= '<li>'.__('CATEGORY_PARAMS').'</li>';
 			}
 
 			if(is_null($is_public))
 			{
 				$validated = false;
-				$error_msg .= '<li>Nav norādīta pamācības redzamība</li>';
+				$error_msg .= '<li>'.__('VISIBILITY_PARAMS').'</li>';
 			}
 
 			// If youtube link was not valid
@@ -192,20 +177,27 @@ class Controller_Tutorials extends Controller_Base
 				$post_data['videourl'] = $videourl;
 				$post_data['category'] = $category_id;
 				if($is_public) {
-					$post_data['visibility1'] = 'checked'; }
+					$post_data['visibility1'] = true; }
 				else {
-					$post_data['visibility0'] = 'checked'; }
+					$post_data['visibility0'] = true; }
+
+				if($language=='en') {
+					$post_data['language_en'] = true; }
+				else {
+					$post_data['language_lv'] = true; }
+				
+
 
 				// Set flash and reload register page
 				$validated = false;
-				$error_msg .= '<li>Video adrese ir ievadīta nepareizi</li>';
+				$error_msg .= '<li>'.__('VIDEO_URL_PARAMS').'</li>';
 			}
 
 			// If tests OK, try to save
 			if($validated) {
 				if($tutorial->save())
 				{
-					Session::set_flash('success', 'Pamācība ir veiksmīgi pievienota!');
+					Session::set_flash('success', __('NEW_TUTORIAL_SUCCESS'));
 					Response::redirect('/tutorials/'.$tutorial->id);
 				}
 			}
@@ -218,11 +210,16 @@ class Controller_Tutorials extends Controller_Base
 				$post_data['videourl'] = $videourl;
 				$post_data['category'] = $category_id;
 				if($is_public) {
-					$post_data['visibility1'] = 'checked'; }
+					$post_data['visibility1'] = true; }
 				else {
-					$post_data['visibility0'] = 'checked'; }
+					$post_data['visibility0'] = true; }
 
-				$error_msg = 'Neizdevās pievienot pamācību šādu iemeslu dēļ:<ul>' . $error_msg . '</ul>';
+				if($language=='en') {
+					$post_data['language_en'] = true; }
+				else {
+					$post_data['language_lv'] = true; }
+		
+				$error_msg = __('TUTORIAL_ERROR').'<ul>' . $error_msg . '</ul>';
 
 				// Set flash and reload register page
 				Session::set_flash('error', $error_msg);
@@ -230,7 +227,7 @@ class Controller_Tutorials extends Controller_Base
 			}
 		}
 		// Select category list for 
-		$categories = DB::select('*')->from('categories')->order_by('title','ASC')->execute()->as_array();
+		$categories = Model_Category::find('all');
 
 		$this->template->navbar = array('explore' => 'active');
 		$this->template->title = 'Tutorials &raquo; Create';
@@ -242,9 +239,8 @@ class Controller_Tutorials extends Controller_Base
 
 	public function action_edit($tutorial_id)
 	{	
-		
-
-		$categories = DB::select('*')->from('categories')->order_by('title','ASC')->execute()->as_array();
+		Lang::load('tutorial_edit');
+		$categories = Model_Category::find('all');
 		$tutorial = Model_Tutorial::find_by_id($tutorial_id);
 		if(!count($tutorial)) { // No tutorials found, might be deleted.
 			Response::redirect_back('/stream', 'refresh');
@@ -256,7 +252,7 @@ class Controller_Tutorials extends Controller_Base
 		}
 
 		// Try to update tutorial
-		if(Input::method() == 'POST')
+		if(Input::method() == 'POST'&&Security::check_token())
 		{	
 			$validated = true;
 			$error_msg = '';
@@ -268,6 +264,7 @@ class Controller_Tutorials extends Controller_Base
 			$videourl = Input::post('videourl');
 			$category_id = Input::post('category');
 			$is_public = Input::post('visibility');
+			$language = Input::post('language');
 
 			// Set new values
 			$tutorial->title = $title;
@@ -276,70 +273,59 @@ class Controller_Tutorials extends Controller_Base
 			$tutorial->videourl = $videourl;
 			$tutorial->category_id = $category_id;
 			$tutorial->is_public = $is_public;
+			$tutorial->language = $language;
 
-			if(mb_strlen($title)>20||mb_strlen($title)<5) 
+			if(mb_strlen($title)>50||mb_strlen($title)<5) 
 			{
 				$validated = false;
-				$error_msg .= '<li>Virsrakstam jābūt 5-50 simbolus garam</li>';
+				$error_msg .= '<li>'.__('TITLE_PARAMS').'</li>';
 			}
 
 			if(mb_strlen($description)<30||mb_strlen($description)>400) {
 				$validated = false;
-				$error_msg .= '<li>Aprakstam jābūt 30-400 simbolus garam</li>';
+				$error_msg .= '<li>'.__('DESCRIPTION_PARAMS').'</li>';
 			}
 
 			if(mb_strlen($contents)>2000) {
 				$validated = false;
-				$error_msg .= '<li>Papildus informācija nevar būt garāka par 2000 simpoliem</li>';
+				$error_msg .= '<li>'.__('CONTENTS_PARAMS').'</li>';
 			}
 
 			// Look for category
-			$categorie = DB::select('*')->from('categories')->where('id',$category_id)->execute()->as_array();
+			$categorie = Model_Category::find('first', array('where' => array(array('id', $category_id))));
 			if(!count($categorie))
 			{
 				$validated = false;
-				$error_msg .= '<li>Nav naorādīta pareiza video kategorija</li>';
+				$error_msg .= '<li>'.__('CATEGORY_PARAMS').'</li>';
 			}
 
 			if(is_null($is_public))
 			{
 				$validated = false;
-				$error_msg .= '<li>Nav norādīta pamācības redzamība</li>';
+				$error_msg .= '<li>'.__('VISIBILITY_PARAMS').'</li>';
 			}
 
 			// If link was not valid
 			if(!Helper::decode_video_url($videourl)) {
 				$validated = false;
-				$error_msg .= '<li>Video adrese ir ievadīta nepareizi</li>';
+				$error_msg .= '<li>'.__('VIDEO_URL_PARAMS').'</li>';
 			}
 
 			if($validated) {
 				// Try to save it
 				if($tutorial->save())
 				{
-					Session::set_flash('success', 'Pamācība ir veiksmīgi sglabāta!');
+					Session::set_flash('success', __('NEW_TUTORIAL_SUCCESS'));
 					Response::redirect('/tutorials/'.$tutorial->id);
 				}
 			}
-			else {
-				// Write data to allow retrying without loosing entered form data
-				$post_data['title'] = $title;
-				$post_data['description'] = $description;
-				$post_data['contents'] = $contents;
-				$post_data['videourl'] = $videourl;
-				$post_data['category'] = $category_id;
-				if($is_public) {
-					$post_data['visibility1'] = 'checked'; }
-				else {
-					$post_data['visibility0'] = 'checked'; }
-
-				$error_msg = 'Neizdevās pievienot pamācību šādu iemeslu dēļ:<ul>' . $error_msg . '</ul>';
-
-				// Set flash and reload register page
-				Session::set_flash('error', $error_msg);
-				Response::redirect('/tutorials/edit/'.$tutorial->id, array('post_data' => $post_data, 'categories' => $categories));
-			}
 		}
+
+		if($tutorial->is_public=='1') { $tutorial->is_public = true; }
+		else { $tutorial->is_public = false; }
+
+		if($tutorial->language=='en') { $tutorial->language = true; }
+		else { $tutorial->language = false; }
 
 		$this->template->navbar = array('explore' => 'active');
 		$this->template->title = 'Tutorials &raquo; Edit';
@@ -352,6 +338,7 @@ class Controller_Tutorials extends Controller_Base
 
 	public function action_delete($tutorial_id)
 	{
+		Lang::load('tutorial_edit');
 		//Find tutorial
 		$tutorial = Model_Tutorial::find_by_id($tutorial_id);
 		//If tutorial doesn't exist, redirect to home
@@ -376,13 +363,17 @@ class Controller_Tutorials extends Controller_Base
 
 	public function action_view($tutorial_id)
 	{
-		$tutorial = Model_Tutorial::find($tutorial_id, array("related" =>
-			    array("user")
+		Lang::load('tutorial_view');
+		$tutorial = Model_Tutorial::find($tutorial_id, array(
+                    "related" => array(
+                        "user", "comments" => array(
+                            "related" => "user"
+                        ))
 		));
 
 		// If this tutorial doesnt exist, set flash
 		if(!count($tutorial)) {
-			Session::set_flash('error', 'Pamācība netika artasta. Iespējams, tā ir izdzēsta, vai arī nekad nav eksistējusi.');
+			Session::set_flash('error', __('TUTORIAL_NOT_FOUND'));
 			Response::redirect_back('/stream', 'refresh');
 		}
 		

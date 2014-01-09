@@ -1,0 +1,46 @@
+<?php
+
+return array(
+	'TUTORIAL_TUTORIAL' => 'Pamācība',
+	'TUTORIAL_DELETED' => 'tika veiksmīgi izdzēsta',
+	'TUTORIAL_RETURN' => 'atgriezties sākuma lapā',
+    'CREATE_TUTORIAL' => 'Izveidot pamācību',
+    'TITLE_PARAMS' => 'Virsrakstam jābūt 5-50 simbolus garam',
+    'DESCRIPTION_PARAMS' => 'Aprakstam jābūt 30-400 simbolus garam',
+    'CONTENTS_PARAMS' => 'Papildus informācija nevar būt garāka par 2000 simboliem',
+    'CATEGORY_PARAMS' => 'Nav izvēlēta kategorija',
+    'VISIBILITY_PARAMS' => 'Nav izvēlēta redzamība',
+    'VIDEO_URL_PARAMS' => 'Video adrese ir nepareiza',
+    'NEW_TUTORIAL_SUCCESS' => 'pamācība pievienota veiksmīgi',
+    'TUTORIAL_ERROR' => 'Nevarēja pievienot pamācību sekojošu iemeslu dēļ',
+    'EDIT_TUTORIAL' => 'Rediģēt pamācību',
+    'DELETE_TUTORIAL' => 'Dzēst pamācību',
+    'DELETE_TUTORIAL_CONFIRMATION' => 'Vai tiešām vēlies izdzēst šo pamācību? Šis process ir neatgriezenisks!',
+    
+    'TUTORIAL_EDIT_TITLE' => 'Pamācības virsraksts',
+    'TUTORIAL_EDIT_DESCRIPTION' => 'Neliels pamācības apraksts (30-400 simboli)',
+    'TUTORIAL_EDIT_URL' => 'Video adrese',
+    'TUTORIAL_EDIT_CONTENTS' => 'papildus informācija par video (līdz 2000 simboliem)',
+    'TUTORIAL_EDIT_CATEGORY' => 'Kategorija',
+    'TUTORIAL_EDIT_CATEGORY_BLANK' => 'Izvēlies kategoriju',
+    'TUTORIAL_EDIT_LANGUAGE' => 'Pamācības valoda',
+    'TUTORIAL_EDIT_VISIBILITY' => 'Pamācības redzamība',
+
+    'TUTORIAL_EDIT_TITLE_PLACEHOLDER' => 'Pamācības virsraksts',
+    'TUTORIAL_EDIT_DESCRIPTION_PLACEHOLDER' => 'Neliels pamācības apraksts. Šo tekstu varēs redzēt meklējot pamācības',
+    'TUTORIAL_EDIT_URL_PLACEHOLDER' => 'http://www.youtube.com/watch?v=xxxxxxxxxxx',
+    'TUTORIAL_EDIT_CONTENTS_PLACEHOLDER' => 'papildus informācija par video. Varēs redzēt zem video, pamācības lapā',
+
+    'VISIBILITY_PUBLIC' => 'Publisks',
+    'VISIBILITY_PRIVATE' => 'Redzams tikai reģistrētiem lietotājiem',
+
+	'TUTORIAL_TITLE_REQUIRED' => 'Virsraksts ir obligāts',
+    'TUTORIAL_TITLE_MINLENGTH' => 'Virsrakstam jābūt vismaz 5 simbolus garam',
+    'TUTORIAL_DESCRIPTION_REQUIRED' => 'Apraksts ir obligāts',
+    'TUTORIAL_DESCRIPTION_MINLENGTH' => 'Aprakstam jābūt vismaz 30 simbolus garam',
+    'TUTORIAL_DESCRIPTION_MAXLENGTH' => 'Apraksts nevar būt garāks par 400 simboliem',
+    'TUTORIAL_VIDEO_URL_REQUIRED' => 'Video adrese ir obligāta',
+    'TUTORIAL_VIDEO_URL_URL' => 'Video adrese ir nepareiza',
+    'TUTORIAL_CONTENTS_MAXLENGTH' => 'Papildus informācija nevar būt garāka par 2000 simboliem',
+    'TUTORIAL_CATEGORY_REQUIRED' => 'Video kategorija ir obligāta',
+); 

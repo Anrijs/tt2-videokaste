@@ -11,45 +11,54 @@
 
 <div class="contents tutorial_form"> <!-- class="container" -->
 
-	<h1 style="display:inline;"> Rediģēt pamācību </h1>
+	<h1 style="display:inline;"> <?php echo __('EDIT_TUTORIAL'); ?> </h1>
   <?php if(Session::get_flash('error')) { 
     echo '<div class="alert alert-danger">';
     echo Session::get_flash('error'); 
     echo '</div>';
  } ?>
-  <a id="confirmButton" onclick="confirmDelete();" href="#"><span class="glyphicon glyphicon-trash"></span>Dzēst pamācību</a>
+  <a id="confirmButton" onclick="confirmDelete();" href="#"><span class="glyphicon glyphicon-trash"></span><?php echo __('DELETE_TUTORIAL'); ?></a>
   <div id="confirmDelete" style="display: none; margin:16px; padding-bottom:44px;" class="alert alert-danger">
-    <h4>Vai tiešām vēlies izszēst šo pamācību? Šis process ir neatgriezenisks!</h4>
+    <h4><?php echo __('DELETE_TUTORIAL_CONFIRMATION'); ?></h4>
     <p class="pull-right" style="display:inline-block;">
-      <a href="/tutorials/delete/<?php echo $tutorial['id']; ?>" class="btn btn-danger">JĀ</a>
-      <a onclick="denyDelete();"  class="btn btn-default">NĒ</a> 
+      <a href="/tutorials/delete/<?php echo $tutorial['id']; ?>" class="btn btn-danger"><?php echo __('YES'); ?></a>
+      <a onclick="denyDelete();"  class="btn btn-default"><?php echo __('NO'); ?></a> 
     </p>
   </div>
 <?php echo Form::open(array('id' => 'new_tutorial','enctype'=>"multipart/form-data")) ?>
+<input type="hidden" name="<?php echo \Config::get('security.csrf_token_key');?>" value="<?php echo \Security::fetch_token();?>" />
 
 <fieldset>
-  <div class="form-group">
-    <label for="exampleInputEmail1">Virsraksts</label>
-    <input type="text" class="form-control" id="title" name="title" placeholder="Pamācības virsraksts" value="<?php echo $tutorial['title']; ?>">
+<div class="form-group">
+    <?php 
+    echo Form::label(__('TUTORIAL_EDIT_TITLE'), 'title');
+    echo Form::input('title', $tutorial['title'], array('class' => 'form-control', 'placeholder' =>  __('TUTORIAL_EDIT_TITLE_PLACEHOLDER')));
+    ?>
   </div>
 
   <div class="form-group">
-    <label for="exampleInputPassword1">Neliels apraksts par video (30-400 simboli)</label>
-    <textarea style="height:120px;" class="form-control" name="description" id="description" placeholder="Šis apraksts ir tas ko varēs redzēt meklējot video"><?php echo $tutorial['description']; ?></textarea>
+    <?php 
+    echo Form::label(__('TUTORIAL_EDIT_URL'), 'videourl');
+    echo Form::input('videourl', $tutorial['videourl'], array('class' => 'form-control', 'placeholder' =>  __('TUTORIAL_EDIT_URL_PLACEHOLDER')));
+    ?>
   </div>
 
   <div class="form-group">
-    <label for="exampleInputPassword1">Video adrese</label>
-    <input type="text" class="form-control" id="videourl" name="videourl" placeholder="http://www.youtube.com/watch?v=y0utu830000" value="<?php echo $tutorial['videourl']; ?>">
+    <?php 
+    echo Form::label(__('TUTORIAL_EDIT_DESCRIPTION'), 'description');
+    echo Form::textarea('description', $tutorial['description'], array('class' => 'form-control', 'placeholder' =>  __('TUTORIAL_EDIT_DESCRIPTION_PLACEHOLDER')));
+    ?>
   </div>
 
   <div class="form-group">
-    <label for="exampleInputPassword1">Papildus informācija par video (neobligāts, 0-3000 simboli)</label>
-    <textarea class="form-control" id="contents" name="contents" placeholder="Piebildes par video, papildus informācija, saites... Tas ko varēs redzēt pamācības lapā zem video."><?php echo $tutorial['contents']; ?></textarea>
+    <?php 
+    echo Form::label(__('TUTORIAL_EDIT_CONTENTS'), 'contents');
+    echo Form::textarea('contents', $tutorial['contents'], array('class' => 'form-control', 'placeholder' =>  __('TUTORIAL_EDIT_CONTENTS_PLACEHOLDER')));
+    ?>
   </div>
 
   <div class="form-group ">
-    <label for="category"> Kategorija </label>
+    <label for="category"> <?php echo __('TUTORIAL_EDIT_CATEGORY'); ?> </label>
     <select class="form-control" id="category" name="category">
       <?php foreach ($categories as $category) { ?>
         <option value="<?php echo $category['id']; ?>"
@@ -61,12 +70,27 @@
     </select>
   </div>
 
-  <div class="form-group">
-    <input <?php if($tutorial['is_public']) {echo 'checked';} ?> type="radio" name="visibility" id="public" value="1"></input><label style="margin-right:16px;" for="public" >Redzams visiem </label>
-    <input <?php if(!$tutorial['is_public']) {echo 'checked';} ?> type="radio" name="visibility" id="private" value="0"></input><label for="private">Redzams tikai reģistrētiem lietotājiem </label>
+    <div class="form-group">
+    <?php 
+      echo Form::label('EN', 'language');
+      echo Form::radio('language', 'en', $tutorial['language'], array('style' => 'margin-right:12px; margin-left:4px;'));
+
+      echo Form::label('LV', 'language');
+      echo Form::radio('language', 'lv', !$tutorial['language'], array('style' => 'margin-left:4px;'));
+     ?>
   </div>
 
-  <button type="submit" class="btn btn-default">Submit</button>
+  <div class="form-group">
+    <?php 
+      echo Form::label(__('VISIBILITY_PUBLIC'), 'visibility');
+      echo Form::radio('visibility', '1', $tutorial['is_public'], array('style' => 'margin-right:12px; margin-left:4px;'));
+
+      echo Form::label(__('VISIBILITY_PRIVATE'), 'visibility');
+      echo Form::radio('visibility', '0', !$tutorial['is_public'], array('style' => 'margin-left:4px;'));
+     ?>
+  </div>
+
+  <button type="submit" class="btn btn-default"><?php echo __('SUBMIT'); ?></button>
 </fieldset>
 </form>
 </div> <!-- /container -->
@@ -105,23 +129,23 @@
     },
     messages: {
       title: {
-        required: "Ievadiet virsrakstu",
-        minlength: "Virsrakstam jābūt vismaz 5 simbolus garam",
+        required: "<?php echo __('TUTORIAL_TITLE_REQUIRED'); ?>",
+        minlength: "<?php echo __('TUTORIAL_TITLE_MINLENGTH'); ?>",
       },
       description: {
-        required: "Ievadiet aprakstu",
-        minlength: "Aprakstam jābūt vismaz 30 simbolus garam",
-        maxlength: "Nu jau pietiks. Limits ir 400 simboli",
+        required: "<?php echo __('TUTORIAL_DESCRIPTION_REQUIRED'); ?>",
+        minlength: "<?php echo __('TUTORIAL_DESCRIPTION_MINLENGTH'); ?>",
+        maxlength: "<?php echo __('TUTORIAL_DESCRIPTION_MAXLENGTH'); ?>",
       },
       videourl: {
-        required: "Ievadiet video adresi",
-        url: "Ievadiet pareizu video adresi (ar visu http://)",
+        required: "<?php echo __('TUTORIAL_VIDEO_URL_REQUIRED'); ?>",
+        url: "<?php echo __('TUTORIAL_VIDEO_URL_URL'); ?>",
       },
       contents: {
-        maxlength: "Nepārcenties! Limits ir 3000 simboli",
+        maxlength: "<?php echo __('TUTORIAL_CONTENTS_MAXLENGTH'); ?>",
       },
       category: {
-        required: "Izvēlieties kategoriju",
+        required: "<?php echo __('TUTORIAL_CATEGORY_REQUIRED'); ?>",
       }
     }
   });

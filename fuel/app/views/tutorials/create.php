@@ -1,38 +1,47 @@
 <div class="contents tutorial_form"> <!-- class="container" -->
 
-	<h1> Izveidot pamācību </h1>
+	<h1> <?php echo __('CREATE_TUTORIAL'); ?> </h1>
   <?php if(Session::get_flash('error')) { 
     echo '<div class="alert alert-danger">';
     echo Session::get_flash('error'); 
     echo '</div>';
  } ?>
 <?php echo Form::open(array('id' => 'new_tutorial')) ?>
+<input type="hidden" name="<?php echo \Config::get('security.csrf_token_key');?>" value="<?php echo \Security::fetch_token();?>" />
+
 <fieldset>
   <div class="form-group">
-    <label for="exampleInputEmail1">Virsraksts (5-60 simboli</label>
-    <input type="text" class="form-control" id="title" name="title" placeholder="Pamācības virsraksts" value="<?php echo $post_data['title']; ?>">
+    <?php 
+    echo Form::label(__('TUTORIAL_EDIT_TITLE'), 'title');
+    echo Form::input('title', $post_data['title'], array('class' => 'form-control', 'placeholder' =>  __('TUTORIAL_EDIT_TITLE_PLACEHOLDER')));
+    ?>
   </div>
 
   <div class="form-group">
-    <label for="exampleInputPassword1">Neliels apraksts par video (30-400 simboli)</label>
-    <textarea style="height:120px;" class="form-control" name="description" id="description" placeholder="Šis apraksts ir tas ko varēs redzēt meklējot video"><?php echo $post_data['description']; ?></textarea>
+    <?php 
+    echo Form::label(__('TUTORIAL_EDIT_URL'), 'videourl');
+    echo Form::input('videourl', $post_data['videourl'], array('class' => 'form-control', 'placeholder' =>  __('TUTORIAL_EDIT_URL_PLACEHOLDER')));
+    ?>
   </div>
 
   <div class="form-group">
-    <label for="exampleInputPassword1">Video adrese</label>
-    <input type="text" class="form-control" id="videourl" name="videourl" placeholder="http://www.youtube.com/watch?v=y0utu830000" value="<?php echo $post_data['videourl']; ?>">
-    </input>
+    <?php 
+    echo Form::label(__('TUTORIAL_EDIT_DESCRIPTION'), 'description');
+    echo Form::textarea('description', $post_data['description'], array('class' => 'form-control', 'placeholder' =>  __('TUTORIAL_EDIT_DESCRIPTION_PLACEHOLDER')));
+    ?>
   </div>
 
   <div class="form-group">
-    <label for="exampleInputPassword1">Papildus informācija par video (neobligāts, 0-2000 simboli)</label>
-    <textarea class="form-control" id="contents" name="contents" placeholder="Piebildes par video, papildus informācija, saites... Tas ko varēs redzēt pamācības lapā zem video."><?php echo $post_data['contents']; ?></textarea>
+    <?php 
+    echo Form::label(__('TUTORIAL_EDIT_CONTENTS'), 'contents');
+    echo Form::textarea('contents', $post_data['contents'], array('class' => 'form-control', 'placeholder' =>  __('TUTORIAL_EDIT_CONTENTS_PLACEHOLDER')));
+    ?>
   </div>
 
   <div class="form-group">
-    <label for="category"> Kategorija </label>
+    <label for="category"> <?php echo __('TUTORIAL_EDIT_CATEGORY'); ?> </label>
     <select class="form-control" id="category" name="category">
-      <option value="" selected disabled >Izvēlies kategoriju</option>
+      <option value="" selected disabled ><?php echo __('TUTORIAL_EDIT_CATEGORY_BLANK'); ?></option>
       <?php foreach ($categories as $category) { ?>
         <option value="<?php echo $category['id']; ?>"
                 <?php if($category['id']==$post_data['category']) {
@@ -42,14 +51,30 @@
       <?php } ?>
     </select>
   </div>
+
   <div class="form-group">
-    <input type="radio" name="visibility" id="public" value="1" <?php echo $post_data['visibility1']; ?> ></input><label style="margin-right:16px;" for="public" >Redzams visiem </label>
-    <input type="radio" name="visibility" id="private" value="0" <?php echo $post_data['visibility0']; ?> ></input><label for="private">Redzams tikai reģistrētiem lietotājiem </label>
+    <?php 
+      echo Form::label('EN', 'language');
+      echo Form::radio('language', 'en', $post_data['language_en'], array('style' => 'margin-right:12px; margin-left:4px;'));
+
+      echo Form::label('LV', 'language');
+      echo Form::radio('language', 'lv', $post_data['language_lv'], array('style' => 'margin-left:4px;'));
+     ?>
+  </div>
+
+  <div class="form-group">
+    <?php 
+      echo Form::label(__('VISIBILITY_PUBLIC'), 'visibility');
+      echo Form::radio('visibility', '1', $post_data['visibility1'], array('style' => 'margin-right:12px; margin-left:4px;'));
+
+      echo Form::label(__('VISIBILITY_PRIVATE'), 'visibility');
+      echo Form::radio('visibility', '0', $post_data['visibility0'], array('style' => 'margin-left:4px;'));
+     ?>
   </div>
   
-  <button type="submit" class="btn btn-default">Submit</button>
+  <button type="submit" class="btn btn-default"><?php echo __('SUBMIT'); ?></button>
 </fieldset>
-</form>
+<?php echo Form::close(); ?>
 </div> <!-- /container -->
 
 <!-- validate form -->
@@ -62,7 +87,6 @@
       title: {
         required: true,
         minlength: 5,
-        maxlength
       },
       description: {
         required: true,
@@ -82,28 +106,28 @@
       },
       contents: {
         required: false,
-        maxlength: 2000,
+        maxlength: 3000,
       }
     },
     messages: {
       title: {
-        required: "Ievadiet virsrakstu",
-        minlength: "Virsrakstam jābūt vismaz 5 simbolus garam",
+        required: "<?php echo __('TUTORIAL_TITLE_REQUIRED'); ?>",
+        minlength: "<?php echo __('TUTORIAL_TITLE_MINLENGTH'); ?>",
       },
       description: {
-        required: "Ievadiet aprakstu",
-        minlength: "Aprakstam jābūt vismaz 30 simbolus garam",
-        maxlength: "Nu jau pietiks. Limits ir 400 simboli",
+        required: "<?php echo __('TUTORIAL_DESCRIPTION_REQUIRED'); ?>",
+        minlength: "<?php echo __('TUTORIAL_DESCRIPTION_MINLENGTH'); ?>",
+        maxlength: "<?php echo __('TUTORIAL_DESCRIPTION_MAXLENGTH'); ?>",
       },
       videourl: {
-        required: "Ievadiet video adresi",
-        url: "Ievadiet pareizu video adresi (ar visu http://)",
+        required: "<?php echo __('TUTORIAL_VIDEO_URL_REQUIRED'); ?>",
+        url: "<?php echo __('TUTORIAL_VIDEO_URL_URL'); ?>",
       },
       contents: {
-        maxlength: "Nepārcenties! Limits ir 3000 simboli",
+        maxlength: "<?php echo __('TUTORIAL_CONTENTS_MAXLENGTH'); ?>",
       },
       category: {
-        required: "Izvēlieties kategoriju",
+        required: "<?php echo __('TUTORIAL_CATEGORY_REQUIRED'); ?>",
       }
     }
   });

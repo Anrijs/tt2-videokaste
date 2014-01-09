@@ -79,7 +79,7 @@ return array(
 		 -1   => array('name' => 'Banned', 'roles' => array('banned')),
 		 0    => array('name' => 'Guests', 'roles' => array()),
 		 1    => array('name' => 'Users', 'roles' => array('user')),
-		 10   => array('namr' => 'Verified', 'roles' => array('user')),
+		 10   => array('name' => 'Verified', 'roles' => array('user')),
 		 50   => array('name' => 'Moderators', 'roles' => array('user', 'moderator')),
 		 100  => array('name' => 'Administrators', 'roles' => array('user', 'moderator', 'admin')),
 	),
@@ -88,6 +88,9 @@ return array(
 	 * Roles as name => array(location => rights)
 	 */
 	'roles' => array(
+            "user" => array(
+                "comment" 
+                    => array("create", "read", "update", "delete"))
 		/**
 		 * Examples
 		 * ---

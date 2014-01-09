@@ -2,9 +2,9 @@
 
       <div class="feed">
         <div class="listitem category" style="vertical-text-align:middle;"> 
-          <h2> Kategorijas </h2>
+          <h2> <?php echo __('TUTORIAL_CATEGORIES'); ?> </h2>
            <a href="/explore">
-              <h3 <?php if($active_category<1) {echo 'class="active"';} ?> style="font-size:20px;">Visas kategorijas</h3></a>
+              <h3 <?php if($active_category<1) {echo 'class="active"';} ?> style="font-size:20px;"><?php echo __('TUTORIAL_ALL_CATEGORIES'); ?></h3></a>
           <?php foreach ($categories as $category) { ?>
             <a href="/explore/<?php echo $category->id; ?>">
               <h3 <?php if($category->id==$active_category) {echo 'class="active"';} ?> ><?php echo $category->title; ?></h3></a>
@@ -41,7 +41,7 @@
            <div class="details">
               <span class="stats">
                 <span class="glyphicon glyphicon-eye-open" ></span> <?php echo $tutorial->views; ?>
-                <span class="glyphicon glyphicon glyphicon-comment" ></span> 26 
+                <span class="glyphicon glyphicon glyphicon-comment" ></span> <?php echo count($tutorial->comments);?> 
               </span>
               <span class="minibuttons">
                 <?php echo date('c',$tutorial->created_at); ?>
@@ -54,10 +54,10 @@
       </div>
 
       <div class="sidebar hidden-xs hidden-sm">
-        <h2>Kategorijas</h2>
+        <h2><?php echo __('TUTORIAL_CATEGORIES'); ?></h2>
         <ul>
           <a href="/explore">
-              <li <?php if($active_category<1) {echo 'class="active"';} ?> style="margin-bottom:16px; ">Visas kategorijas</li>
+              <li <?php if($active_category<1) {echo 'class="active"';} ?> style="margin-bottom:16px; "><?php echo __('TUTORIAL_ALL_CATEGORIES'); ?></li>
           </a>
           <?php foreach ($categories as $category) { ?>
             <a href="/explore/<?php echo $category->id; ?>">

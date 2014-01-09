@@ -1,7 +1,5 @@
     <div class="contents index"> <!-- class="container" -->
         <div class="feed">
-                <div class="alert alert-danger" style="font-size:32px; margin:24px; padding:24px;">Jāsataisa pareiza atlase! </div>
-
           <?php
               if(Session::get_flash('error')) {
               ?>
@@ -10,27 +8,16 @@
                 </div>
               <?php
             } ?>
-          <?php if(count($tutorials)<1) { ?>
+          <?php if(empty($followers)) { ?>
 
-            <h1> Izskatās ka Tu vēl neseko nevienam lietotājam. </h1>
-            <p class="lead">Ir vairākas iespējas kā atrast lietotājus kam sekot:
-              <ul class="lead">
-                <li>
-                  Dodies uz <a href="/users">lietotāju</a> lapu
-                </li>
-                <li>
-                  Dodies uz <a href="/explore">pamācību</a> lapu
-                </li>
-                <li>
-                  Izmanto meklēšanas rīku navigācijas joslā
-                </li>
-                <!-- <li>
-                  Izvēlies kādu lietotāju no saraksta, kas atrodams zemāk 
-                </li> -->
-              </ul>
+            <h1> <?php echo __('NOT_FOLLOWING'); ?> </h1>
+            <p class="lead"> <?php echo __('START_FOLLOWING'); ?>
             </p>
           <?php } ?>
-          <?php foreach ($tutorials as $tutorial) { ?>
+
+          <?php foreach ($followers as $follower) {  ?>
+          <?php foreach ($follower->user->tutorials as $tutorial) {  ?>
+          <?php  { ?>
         <div class="listitem"> 
     
           <img src="http://img.youtube.com/vi/<?php echo Helper::decode_video_url($tutorial->videourl)?>/mqdefault.jpg" class="thumbnail">
@@ -47,7 +34,7 @@
                <div class="details">
                   <span class="stats">
                     <span class="glyphicon glyphicon-eye-open" ></span> <?php echo $tutorial->views; ?>
-                    <span class="glyphicon glyphicon glyphicon-comment" ></span> 26 
+                    <span class="glyphicon glyphicon glyphicon-comment" ></span> <?php echo count($tutorial->comments);?> 
                   </span>
                   <span class="minibuttons">
                     <?php echo date('c',$tutorial->created_at); ?>
@@ -55,7 +42,7 @@
                </div>
             </div>   
 
-            <?php } 
+            <?php } } }
 
               if(isset($_GET['page'])) {
                 $current_page = $_GET['page'];
@@ -64,29 +51,14 @@
                 $current_page = 1;
               }
             ?>
-            <?php if(count($tutorials)>0) { ?>
-              <ul class="pager">
-                <li class="<?php if($current_page==1) {echo 'disabled'; } ?>">
-                  <a href="<?php 
-                      if($current_page==1) {echo '#';} 
-                      else if($current_page>$page_count) {echo '/stream?page='.($page_count);} 
-                      else {echo '/stream?page='.($current_page-1);} ?>">Previous</a>
-                </li>
-                <li class="<?php if($current_page>=$page_count) {echo 'disabled';} ?>">
-                  <a href="<?php if($current_page>=$page_count) {echo '#';} else {echo '/stream?page='.($current_page+1);} ?>">Next</a>
-                </li>
-              </ul>
-              <?php } ?>
 
         </div> <!-- end of feed --> 
 
         <div class="sidebar_right hidden-sm hidden-xs">
             <p class="lead" style="text-align:center;">
-                This seems like a nice place for your ad.
-                <br>  <br>
-                But i will use this for debuging
-                <br> <br>
-                <?php echo $page_count; ?>
+            <a href="http://www.youtube.com/datorikilv">
+                <img src="https://lh5.googleusercontent.com/-69vppeBrbeU/AAAAAAAAAAI/AAAAAAAAAAA/fwDQ9cCAUcg/s200-c-k-no/photo.jpg">
+                </a>
             </p>
 
         </div>  

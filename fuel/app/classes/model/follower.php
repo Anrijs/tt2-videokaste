@@ -21,5 +21,12 @@ class Model_Follower extends \Orm\Model
 		),
 	);
 	protected static $_table_name = 'followers';
+        
+        protected static $_belongs_to = array(
+        'user' => array(
+                'key_from' => 'following_id',
+                'model_to' => 'Model_User',
+                'key_to' => 'id'
+        ));
 
 }

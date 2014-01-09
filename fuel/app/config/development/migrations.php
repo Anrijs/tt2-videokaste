@@ -12,6 +12,9 @@ return array(
 				3 => '004_create_users',
 				4 => '005_create_followers',
 				5 => '006_create_categories',
+				6 => '007_create_comments',
+				7 => '008_add_user_language',
+				8 => '009_add_tutorial_language',
 			),
 		),
 		'module' => 

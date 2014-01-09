@@ -13,8 +13,9 @@
 
 return array(
 	'cookie_watch_time' => '600', // lasts for 10 minutes
-	'paginate_single' => '5', // lasts for 10 minutes
-	'paginate_double' => '10', // lasts for 10 minutes
+	'cookie_language_time' => '86400', // lasts for 24 hrs
+	'paginate_single' => '5', // 5 pp
+	'paginate_double' => '10', // 10 pp
 	/**
 	 * base_url - The base URL of the application.
 	 * MUST contain a trailing slash (/)
@@ -26,7 +27,7 @@ return array(
 	 *
 	 * Set this to null to have it automatically detected.
 	 */
-	// 'base_url'  => null,
+	 'base_url'  => null,
 
 	/**
 	 * url_suffix - Any suffix that needs to be added to
@@ -37,34 +38,34 @@ return array(
 	 *
 	 * Set this to an empty string if no suffix is used
 	 */
-	// 'url_suffix'  => '',
+	 'url_suffix'  => '',
 
 	/**
 	 * index_file - The name of the main bootstrap file.
 	 *
 	 * Set this to 'index.php if you don't use URL rewriting
 	 */
-	// 'index_file' => false,
+	 'index_file' => false,
 
-	// 'profiling'  => false,
+	 'profiling'  => false,
 
 	/**
 	 * Default location for the file cache
 	 */
-	// 'cache_dir'       => APPPATH.'cache/',
+	 'cache_dir'       => APPPATH.'cache/',
 
 	/**
 	 * Settings for the file finder cache (the Cache class has it's own config!)
 	 */
-	// 'caching'         => false,
-	// 'cache_lifetime'  => 3600, // In Seconds
+	 'caching'         => false,
+	 'cache_lifetime'  => 3600, // In Seconds
 
 	/**
 	 * Callback to use with ob_start(), set this to 'ob_gzhandler' for gzip encoding of output
 	 */
-	// 'ob_callback'  => null,
+	 'ob_callback'  => null,
 
-	// 'errors'  => array(
+	 'errors'  => array(
 		// Which errors should we show, but continue execution? You can add the following:
 		// E_NOTICE, E_WARNING, E_DEPRECATED, E_STRICT to mimic PHP's default behaviour
 		// (which is to continue on non-fatal errors). We consider this bad practice.
@@ -75,19 +76,24 @@ return array(
 		// 'notices'      => true,
 		// Render previous contents or show it as HTML?
 		// 'render_prior' => false,
-	// ),
+	 ),
 
 	/**
 	 * Localization & internationalization settings
 	 */
-	// 'language'           => 'en', // Default language
-	// 'language_fallback'  => 'en', // Fallback language when file isn't available for default language
-	// 'locale'             => 'en_US', // PHP set_locale() setting, null to not set
+	
+	'language' => 'en',
+	'language_fallback'  => 'en', // Fallback language when file isn't available for default language
+	'locale'             => 'en_US', // PHP set_locale() setting, null to not set
+	'locales'			=> array(
+		'lv' => 'lv_LV',
+		'en' => 'en_US',
+	),
 
 	/**
 	 * Internal string encoding charset
 	 */
-	// 'encoding'  => 'UTF-8',
+	'encoding'  => 'UTF-8',
 
 	/**
 	 * DateTime settings
@@ -288,12 +294,12 @@ return array(
 		 *
 		 * A path must be set in module_paths for this to work.
 		 */
-		// 'modules'  => array(),
+		 'modules'  => array(),
 
 		/**
 		 * Classes to autoload & initialize even when not used
 		 */
-		// 'classes'  => array(),
+		 'classes'  => array(),
 
 		/**
 		 * Configs to autoload
@@ -303,7 +309,7 @@ return array(
 		 * add it like 'session' => 'auth'.
 		 * If you don't want the config in a group use null as groupname.
 		 */
-		// 'config'  => array(),
+		 'config'  => array(),
 
 		/**
 		 * Language files to autoload
@@ -313,7 +319,7 @@ return array(
 		 * add it like 'validation' => 'forms'.
 		 * If you don't want the lang in a group use null as groupname.
 		 */
-		// 'language'  => array(),
+		 'language'  => array(),
 	// ),
 
 );

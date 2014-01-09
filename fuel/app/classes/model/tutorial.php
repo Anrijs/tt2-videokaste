@@ -14,6 +14,7 @@ class Model_Tutorial extends \Orm\Model
 		'views',
 		'created_at',
 		'updated_at',
+		'language',
 	);
 
 	protected static $_observers = array(
@@ -28,15 +29,15 @@ class Model_Tutorial extends \Orm\Model
 	);
 	protected static $_table_name = 'tutorials';
 	
-	//protected static $_has_many = array(
-    //'comments' => array(
-    //    'key_from' => 'id',
-    //    'model_to' => 'Model_Comment',
-    //    'key_to' => 'post_id',
-    //    'cascade_save' => true,
-    //    'cascade_delete' => false,
-    //)
-	//);
+	protected static $_has_many = array(
+        'comments' => array(
+            'model_to' => 'Model_Comment',
+            'key_from' => 'id',
+            'key_to' => 'tutorial_id',           
+            'cascade_save' => true,
+            'cascade_delete' => false,
+        )
+	);
 
 	protected static $_belongs_to = array(
 	'user' => array(

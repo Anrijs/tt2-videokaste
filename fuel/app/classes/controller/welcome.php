@@ -29,4 +29,17 @@ class Controller_Welcome extends Controller_Base
 		$this->template->content = View::forge('welcome/about');
 	}
 
+	public function action_language($id)
+	{
+		if($this->current_user) {
+			$this->current_user->language = $id;
+			$this->current_user->save();
+		}
+		else {
+			$cookie_time=Config::get('cookie_language_time');
+			Cookie::set('videokaste_language', $id, $cookie_time);
+		}
+		Response::redirect_back('/stream', 'refresh');
+	}
+
 }

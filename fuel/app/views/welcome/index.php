@@ -4,17 +4,14 @@
     		<h1> Videokaste.lv </h1>
     		<div class="desc">
     		    <p>
-    				Mūsu sistēma sniedz ērtu un intuitīvu veidu kā lietotājiem atrast un ievietot savas video pamācības
-                    par dažādām tēmām piemēram - Web tehnoloģiju izstrāde, video montēšana, ēdienu gatavošana u.c. 
-                    Video pamācību veidotāji, blakus savām pamācībām, var izvietot reklāmas, kas, savukārt,
-                    var sniegt nepieciešamos resursus jauna un kvalitatīva satura veidošanai.
+    		    	<?php echo __('GUEST_MAIN'); ?>
     			</p>
-    			<a class="btn btn-default pull-right btn-lg" href="/about">Par projektu</a>
-                <a href="/users/login" class="btn btn-default pull-right btn-lg" >Ieiet</a>
-    		    <a href="/users/create" class="btn btn-primary pull-right btn-lg" >Reģistrēties</a>
+    			<a class="btn btn-default pull-right btn-lg" href="/about"><?php echo __('ABOUT'); ?></a>
+                <a href="/users/login" class="btn btn-default pull-right btn-lg" ><?php echo __('LOG_IN'); ?></a>
+    		    <a href="/users/create" class="btn btn-primary pull-right btn-lg" ><?php echo __('REGISTER'); ?></a>
     		</div>
     	</div>
-    	<div class="stats">Reģistrēti lietotāji: <?php echo $total_users; ?> | Pamācības: <?php echo $total_tutorials; ?></div>
+    	<div class="stats"><?php echo __('STATUS_REGISTRED').': '.$total_users.' | '.__('STATUS_TUTORIALS').': '.$total_tutorials; ?></div>
         <?php } ?>
 
     </div> <!-- /container -->

@@ -12,6 +12,10 @@ return array(
 	'tutorials/delete/:id' => 'tutorials/delete/$1',
 	'tutorials/:id' => 'tutorials/view/$1',
 	'u/:username' => 'users/view/$1',
+	'edit' => 'users/edit',
+        'follow/:username' => 'users/follow/$1',
+        'unfollow/:username' => 'users/unfollow/$1',
+	'lang/:id' => 'welcome/language/$1',
 	
 	'hello(/:name)?' => array('welcome/hello', 'name' => 'hello'),
 );

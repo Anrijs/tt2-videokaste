@@ -3,65 +3,83 @@
       <div class="feed">
       
         <!-- Listitem start -->
+        <?php if($user->tutorials == NULL) 
+        {
+            if($user == $current_user)
+            {
+                echo '<h1>'.__("NO_TUTORIALS_CURRENT_USER").'</h1>';
+            }
+            else {
+                echo '<h1>'.__("NO_TUTORIALS_NOT_CURRENT_USER").'</h1>';
+            }
+        }
+        else
+        {
+            foreach ($user->tutorials as $tutorial){?>
         <div class="listitem"> 
               
-            <img src="http://placehold.it/640x360" class="thumbnail hidden-xs hidden-sm">
-            <a href="tutorial.php" class="title"><h2 class="pull-left">%Tutorial name%</h2></a>
-            <a href="user.php" class="author">by %author name%</a>
+            <img src="http://img.youtube.com/vi/<?php echo Helper::decode_video_url($tutorial->videourl)?>/mqdefault.jpg" class="thumbnail">
+            <a href="/tutorials/<?php echo $tutorial->id;?>" class="title"><h2><?php echo $tutorial->title;?></h2></a>
+            <a href="/u/<?php echo $user->username;?>" class="author">by <?php echo $user->username; ?></a>
             <p class="description">
-             %description_short%
-             Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-           </p>
+                <?php echo $tutorial->description;?>
+            </p>
+            
+           
            
            <div class="details">
               <span class="stats">
-                <span class="glyphicon glyphicon-eye-open" ></span> 120
-                <span class="glyphicon glyphicon glyphicon-comment" ></span> 26 
-              </span>
-              <span class="minibuttons">
-                <button type="button" class="btn btn-default btn-sm">
-                  <span class="glyphicon glyphicon-calendar"></span> Watch later
-                </button>
+                <span class="glyphicon glyphicon-eye-open" ></span> <?php echo $tutorial->views;?>
+                <span class="glyphicon glyphicon glyphicon-comment" ></span> <?php echo count($tutorial->comments);?> 
               </span>
            </div>
         </div>
-
+            <?php }}?>
+        
 
       </div>
 
       <div class="sidebar">
         <div class="profile">
 
-        <img src="http://placehold.it/180x180" class="imgWrap">
-        <a href="#" class="btn btn-default btn-small imgWrapText">Nomainīt bilid</a>
+            <?php
+                $email = $user->email;
+                $gravatar_link = 'http://www.gravatar.com/avatar/' . md5($email) . '?s=180';
+                echo '<img src="' . $gravatar_link . '" />';
+             ?>
+            
 
-        <h3>%user_name%</h3>
-        <p class="lead">
-          %user_desc% Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua.
-        </p>
+
+        <h3><?php echo Helper::visual_name($user->id);?></h3>
         <div class="stats">
-          <span class="glyphicon glyphicon-user"></span> Followers: 7,093
+          <span class="glyphicon glyphicon-user"></span> <?php echo __('FOLLOWERS'); ?>: <?php echo count($user->following); ?>
           <br>
-          <span class="glyphicon glyphicon-film"></span> Tutorials: 20
+          <span class="glyphicon glyphicon-film"></span> <?php echo __('TUTORIALS'); ?>: <?php echo count($user->tutorials); ?>
         </div>
-        <button type="button" class="btn btn-default btn-sm">Follow</button> <!-- Ja tas ir 'mans' profils, tad te rādās edit porga -->
-        <button type="button" class="btn btn-default btn-sm">Share</button>
-
+        <?php
+        if($current_user) { 
+        if(!Model_Follower::find("all", array("where"=>array("following_id" => $user->id, "follower_id" => $this->current_user->id))) && 
+                $user->id!= $current_user->id)
+        { ?>
+            <a href="/follow/<?php echo $user->username;?>" class="btn btn-default btn-sm"><?php echo __('FOLLOW'); ?></a>
+        <?php
+        }
+        ?>
+        <?php if(Model_Follower::find("all", array("where"=>array("following_id" => $user->id, "follower_id" => $this->current_user->id))))
+        { ?>
+            <a href="/unfollow/<?php echo $user->username;?>" class="btn btn-default btn-sm"><?php echo __('UNFOLLOW'); ?></a>
+        <?php
+        }}?>
+        
+          <!-- Ja tas ir 'mans' profils, tad te rādās edit poga, links /edit-->
+      
       </div>
       
       <div class="sidebar_right hidden-sm hidden-xs hidden-md">
         <p class="lead" style="text-align:center;">
-                This seems like a nice place for your ad...
-                <br>  <br>
-                But i will use this for:
-                <br>
-                <?php echo '<b>debuging</b>'; ?>
+ <a href="http://www.youtube.com/datorikilv">
+                <img src="https://lh5.googleusercontent.com/-69vppeBrbeU/AAAAAAAAAAI/AAAAAAAAAAA/fwDQ9cCAUcg/s200-c-k-no/photo.jpg">
+                </a>
             </p>
     </div>
       </div>
